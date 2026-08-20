@@ -1,2 +1,4 @@
-# SimplifyNext_CS_Larpers
-For SimplifyNext Agentic AI Hackathon! Uh. yeah!
+# Team CS Larpers
+
+Set up instructions:
+

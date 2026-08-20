@@ -1,0 +1,25 @@
+{
+  "name": "simplifynext_cs_larpers",
+  "version": "1.0.0",
+  "description": "Set up instructions:",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timothyorsmth/SimplifyNext_CS_Larpers.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/timothyorsmth/SimplifyNext_CS_Larpers/issues"
+  },
+  "homepage": "https://github.com/timothyorsmth/SimplifyNext_CS_Larpers#readme",
+  "dependencies": {
+    "vite": "^8.2.2"
+  }
+}
