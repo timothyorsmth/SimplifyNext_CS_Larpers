@@ -39,8 +39,8 @@ html, body {
 body {
   font-family: 'Poppins', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  color: var(--color-text);
-  background: var(--color-bg);
+  color: var(--colour-dark);
+  background: var(--colour-light);
 }
 
 /* Make buttons look prettier */
@@ -56,3 +56,22 @@ ul, ol { list-style: none; }
 /* Base typography */
 h1, h2, h3 { font-weight: 600; }
 h1 { font-size: var(--font-size-xl); }
+
+/* Main panel */
+.mainPanel {
+  height: 90vh;
+  width: 100%;
+}
+
+.navPanel {
+  height: 20vh;
+  width: 100%;
+
+  position: fixed;
+
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  text-align: center;
+  background-color: var(--colour-grey);
+  color: var(--colour-dark);
+}

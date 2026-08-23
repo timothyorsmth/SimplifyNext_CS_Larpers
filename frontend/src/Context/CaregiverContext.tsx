@@ -8,16 +8,18 @@ type CaregiverData = {
     first_name: string;
     last_name: string;
   };
+  profile_picture_url: string;
 };
 
 type CaregiverContextValue = {
+  recipientId: string | null;
   caregivers: CaregiverData[];
   activeCaregiverId: string | null;
   activeCaregiver: CaregiverData | null;
   setActiveCaregiverId: React.Dispatch<React.SetStateAction<string | null>>;
   activeCaregiverFirstName: string | null;
   activeCaregiverLastName: string | null;
-  recipientId: string | null;
+  activeCaregiverPFPUrl: string | null;
   loading: boolean;
 };
 
@@ -35,39 +37,43 @@ export function CaregiverProvider({ children }: { children: React.ReactNode }) {
             setCaregivers(users);
             setActiveCaregiverId(users[0]?.id ?? null); // default to first user
             setLoading(false);
-            console.log(users);
         });
     }, []);
+    
+    // Run if loading is done already
+    if (loading == false) {
+        const activeCaregiver = caregivers.find((u) => u.id === activeCaregiverId) ?? null;
+        console.log('activeCaregiverId:', activeCaregiverId, 'activeCaregiver:', activeCaregiver);
 
-  // Derive the active user by finding the match in `caregivers`, using
-  // `activeCaregiverId` as the source of truth. This is the key fix —
-  // whenever activeCaregiverId changes (e.g. via a switcher), this
-  // recalculates automatically on the next render. No separate state
-  // to fall out of sync.
-  const activeCaregiver = caregivers.find((u) => u.id === activeCaregiverId) ?? null;
+        const activeCaregiverFirstName = activeCaregiver?.profile.first_name ?? null;
+        const activeCaregiverLastName = activeCaregiver?.profile.last_name ?? null;
+        const activeCaregiverPFPUrl = activeCaregiver?.profile_picture_url ?? null;
 
-  const activeCaregiverFirstName = activeCaregiver?.profile.first_name ?? null;
-  const activeCaregiverLastName = activeCaregiver?.profile.last_name ?? null;
+        console.log(activeCaregiverFirstName);
 
-  const value: CaregiverContextValue = {
-    caregivers,
-    activeCaregiverId,
-    activeCaregiver,
-    setActiveCaregiverId,
-    activeCaregiverFirstName,
-    activeCaregiverLastName,
-    recipientId: activeCaregiver?.recipientId ?? null,
-    loading,
-  };
+        const value: CaregiverContextValue = {
+            caregivers,
+            activeCaregiverId,
+            activeCaregiver,
+            setActiveCaregiverId,
+            activeCaregiverFirstName,
+            activeCaregiverLastName,
+            activeCaregiverPFPUrl,
+            recipientId: activeCaregiver?.recipientId ?? null,
+            loading,
+        };
 
-  return (
-    <CaregiverContext.Provider value={value}>
-      {children}
-    </CaregiverContext.Provider>
-  );
+        return (
+            <CaregiverContext.Provider value={value}>
+            {children}
+            </CaregiverContext.Provider>
+        );
+    }
+
+    
 }
 
-export function useCaregiver() {
+export function getCaregiverInfo() {
   const context = useContext(CaregiverContext);
   if (!context) {
     throw new Error('useCaregiver must be used within a CaregiverProvider');

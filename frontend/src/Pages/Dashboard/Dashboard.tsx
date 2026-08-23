@@ -3,13 +3,13 @@
 
 // Import files
 import './Dashboard.css';
-import { useCaregiver } from '../../Context/CaregiverContext';
+import { getCaregiverInfo } from '../../Context/CaregiverContext';
 
 function Dashboard(){
-    const { activeCaregiverFirstName, loading } = useCaregiver();
+    const { activeCaregiverFirstName, loading } = getCaregiverInfo();
 
     return(
-        <>
+        <div className="Dashboard">
             {/* Welcome Banner */}
             <div className="WelcomeHeader">
                 <div>
@@ -23,7 +23,7 @@ function Dashboard(){
 
             {/*  */}
 
-        </>
+        </div>
     );
 }
 
