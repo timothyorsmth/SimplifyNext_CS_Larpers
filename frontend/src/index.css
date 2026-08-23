@@ -45,8 +45,14 @@ body {
 
 /* Make buttons look prettier */
 button, input, textarea, select {
-  font: inherit;
+  background: transparent;
   color: inherit;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit
 }
 
 /* Remove the default blue colour from links (yucks!) and removes the dots from list objects */
@@ -59,19 +65,6 @@ h1 { font-size: var(--font-size-xl); }
 
 /* Main panel */
 .mainPanel {
-  height: 90vh;
+  height: 85vh;
   width: 100%;
-}
-
-.navPanel {
-  height: 20vh;
-  width: 100%;
-
-  position: fixed;
-
-  display: grid;
-  grid-template-columns: auto auto auto auto auto;
-  text-align: center;
-  background-color: var(--colour-grey);
-  color: var(--colour-dark);
 }

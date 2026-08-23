@@ -5,6 +5,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 // Import pages
 import Dashboard from './Pages/Dashboard/Dashboard'
 
+// Import components
+import NavBar from './Components/NavBar/NavBar'
+
 function App() {
 
   return (
@@ -19,23 +22,7 @@ function App() {
         </div>
 
         {/* Navbar */}
-        <div className="navPanel">
-          <div className="PanelItem Home">
-            <p>Home</p>
-          </div>
-          <div className="PanelItem Schedule">
-            <p>Schedule</p>
-          </div>
-          <div className="PanelItem Chat">
-
-          </div>
-          <div className="PanelItem Tasks">
-            <p>Tasks</p>
-          </div>
-          <div className="PanelItem RecipientInfo">
-            <p>Recipient</p>
-          </div>
-        </div>
+        <NavBar />
       </div>
     </BrowserRouter>
   )
