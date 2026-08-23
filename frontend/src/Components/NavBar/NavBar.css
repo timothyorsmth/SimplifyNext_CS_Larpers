@@ -39,7 +39,7 @@
   width: 65px;
   height: 65px;
   border-radius: 50%; 
-  border: 3px solid #354947;
+  border: 3px solid var(--colour-dark);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); 
   
   margin-top: -3vh;
@@ -48,20 +48,20 @@
 }
 
 .ChatButton.active {
-  border: 3px solid #e0dcd1;
+  border: 3px solid var(--colour-light);
   transition: 0.3s;
 }
 
 .nonactive {
-  background-color: #e0dcd1;      
-  color: #354947;
+  background-color: var(--colour-grey);      
+  color: var(--colour-dark);
 
   transition: 0.3s;
 }
 
 .active {
-  background-color: #354947; 
-  color: #e0dcd1;
+  background-color: var(--colour-dark); 
+  color: var(--colour-light);
 
   transition: 0.3s;
 }

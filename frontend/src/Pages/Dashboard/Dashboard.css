@@ -2,3 +2,22 @@
     margin: 5vw;
     margin-top: 5vh;
 }
+
+.WelcomeHeader {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+}
+
+.UserProfilePic {
+    width: 15vw;
+    height: 15vw;
+    border-radius: 50%;
+
+    background-size: cover;
+}
+
+.ProfilePicContainer{
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}

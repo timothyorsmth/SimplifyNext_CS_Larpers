@@ -8,6 +8,6 @@
     },
     "recipientId": "recp_00001",
     "preferences": { "notifications": true },
-    "profile_picture_url": "../frontend/src/Assets/profile_pic_example_1"
+    "profile_picture_url": "/Assets/profile_pic_example_1.png"
   }
 ]
