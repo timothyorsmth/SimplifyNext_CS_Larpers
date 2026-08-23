@@ -1,0 +1,58 @@
+/* Design tokens (basically like constants that we reference) */
+:root {
+    --colour-light: #f8f4f1;
+    --colour-dark: #354947;
+    --colour-grey: #e0dcd1;
+    --colour-blue: #d6e3e9;
+    --colour-green: #e5e3bd;
+
+    /* For warnings and shit */
+    --colour-warning: #f4d68d;
+    --colour-error: #d24c19;
+
+    /* Spacing scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+
+  /* Typography */
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.75rem;
+}
+
+/* Default formatting shit :P */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+/* Change the default font here */
+body {
+  font-family: 'Poppins', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+/* Make buttons look prettier */
+button, input, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Remove the default blue colour from links (yucks!) and removes the dots from list objects */
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+
+/* Base typography */
+h1, h2, h3 { font-weight: 600; }
+h1 { font-size: var(--font-size-xl); }
