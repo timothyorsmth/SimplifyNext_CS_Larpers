@@ -1,0 +1,24 @@
+[
+  {
+    "id": "user_00001",
+    "email": "julia@example.com",
+    "profile": {
+      "first_name": "Julia",
+      "last_name": "Tan Jia Yok"
+    },
+    "recipientId": "recp_00001",
+    "preferences": { "notifications": true },
+    "created_at": "2026-08-23"
+  },
+  {
+    "id": "user_00002",
+    "email": "james@example.com",
+    "profile": {
+      "first_name": "James",
+      "last_name": "Tan Jia Le"
+    },
+    "recipientId": "recp_00001",
+    "preferences": { "notifications": false },
+    "created_at": "2026-08-23"
+  }
+]
