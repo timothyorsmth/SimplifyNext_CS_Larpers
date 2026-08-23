@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { fetchUserData } from '../API/careCircleData.tsx';
 
+// What we import from the JSON file
+// MUST MATCH JSON DATA
 type CaregiverData = {
   id: string;
   recipientId: string;
@@ -11,6 +13,7 @@ type CaregiverData = {
   profile_picture_url: string;
 };
 
+// What the other files reference
 type CaregiverContextValue = {
   recipientId: string | null;
   caregivers: CaregiverData[];
@@ -23,54 +26,54 @@ type CaregiverContextValue = {
   loading: boolean;
 };
 
+// A context is a way to pass information to different files
+// Priyanka lmk if this is like the correct way to use this because im legit dont knows
 const CaregiverContext = createContext<CaregiverContextValue | null>(null);
 
+// 
 export function CaregiverProvider({ children }: { children: React.ReactNode }) {
-    // Not supposed to be in the full application if we do scale this
-    // But for the demo since we only have 2 users, we can like lowkirkenuinely cheat this
-    const [caregivers, setCaregivers] = useState<CaregiverData[]>([]);
-    const [activeCaregiverId, setActiveCaregiverId] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+  // Not supposed to be in the full application if we do scale this
+  // But for the demo since we only have 2 users, we can like lowkirkenuinely cheat this
+  const [caregivers, setCaregivers] = useState<CaregiverData[]>([]);
+  const [activeCaregiverId, setActiveCaregiverId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchUserData().then((users) => {
-            setCaregivers(users);
-            setActiveCaregiverId(users[0]?.id ?? null); // default to first user
-            setLoading(false);
-        });
-    }, []);
-    
-    // Run if loading is done already
-    if (loading == false) {
-        const activeCaregiver = caregivers.find((u) => u.id === activeCaregiverId) ?? null;
-        console.log('activeCaregiverId:', activeCaregiverId, 'activeCaregiver:', activeCaregiver);
+  useEffect(() => {
+      fetchUserData().then((users) => {
+          setCaregivers(users);
+          setActiveCaregiverId(users[0]?.id ?? null); // default to first user
+          setLoading(false);
+      });
+  }, []);
+  
+  // Run ONLY if loading is done
+  if (loading == false) {
+    const activeCaregiver = caregivers.find((u) => u.id === activeCaregiverId) ?? null;
 
-        const activeCaregiverFirstName = activeCaregiver?.profile.first_name ?? null;
-        const activeCaregiverLastName = activeCaregiver?.profile.last_name ?? null;
-        const activeCaregiverPFPUrl = activeCaregiver?.profile_picture_url ?? null;
+    const activeCaregiverFirstName = activeCaregiver?.profile.first_name ?? null;
+    const activeCaregiverLastName = activeCaregiver?.profile.last_name ?? null;
+    const activeCaregiverPFPUrl = activeCaregiver?.profile_picture_url ?? null;
 
-        console.log(activeCaregiverFirstName);
+    // Set current user values :)
+    const value: CaregiverContextValue = {
+        caregivers,
+        activeCaregiverId,
+        activeCaregiver,
+        setActiveCaregiverId,
+        activeCaregiverFirstName,
+        activeCaregiverLastName,
+        activeCaregiverPFPUrl,
+        recipientId: activeCaregiver?.recipientId ?? null,
+        loading,
+    };
 
-        const value: CaregiverContextValue = {
-            caregivers,
-            activeCaregiverId,
-            activeCaregiver,
-            setActiveCaregiverId,
-            activeCaregiverFirstName,
-            activeCaregiverLastName,
-            activeCaregiverPFPUrl,
-            recipientId: activeCaregiver?.recipientId ?? null,
-            loading,
-        };
-
-        return (
-            <CaregiverContext.Provider value={value}>
-            {children}
-            </CaregiverContext.Provider>
-        );
-    }
-
-    
+    // Return the providers
+    return (
+        <CaregiverContext.Provider value={value}>
+        {children}
+        </CaregiverContext.Provider>
+    );
+  }
 }
 
 export function getCaregiverInfo() {

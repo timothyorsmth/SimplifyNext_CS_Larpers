@@ -9,11 +9,13 @@ import { BsChatLeftDots, BsChatLeftDotsFill  } from "react-icons/bs";
 
 import './NavBar.css';
 
+// The list of navigation bar items that is on the left of the chat icon
 const NAV_ITEMS_LEFT = [
   { to: '/', label: 'Home', icon: BsHouse, activeIcon: BsFillHouseFill },
   { to: '/schedule', label: 'Schedule', icon: FaRegCalendarAlt, activeIcon: FaCalendarAlt },
 ];
 
+// Same as above but on the right
 const NAV_ITEMS_RIGHT = [
   { to: '/tasks', label: 'Tasks', icon: IoCheckboxOutline, activeIcon: IoCheckbox },
   { to: '/recipient', label: 'Recipient', icon: BsFileEarmarkPerson, activeIcon: BsFillFileEarmarkPersonFill },
@@ -27,9 +29,8 @@ function NavBar() {
             <NavLink
                 key={to}
                 to={to}
-            // NavLink calls this function itself, passing { isActive } —
-            // we use it to conditionally add an "active" class for styling.
             className={({ isActive }) =>
+                // Checks if is active, if active then we put the correct class tag
                 isActive ? 'PanelItem active' : 'PanelItem nonactive'
             }
             >
