@@ -9,5 +9,16 @@
     "recipientId": "recp_00001",
     "preferences": { "notifications": true },
     "profile_picture_url": "/Assets/profile_pic_example_1.png"
+  },
+  {
+    "id": "user_00002",
+    "email": "julia@example.com",
+    "profile": {
+      "first_name": "Julia",
+      "last_name": "Tan Jia Yok"
+    },
+    "recipientId": "recp_00001",
+    "preferences": { "notifications": true },
+    "profile_picture_url": "/Assets/profile_pic_example_1.png"
   }
 ]

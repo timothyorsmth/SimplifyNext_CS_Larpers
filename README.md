@@ -34,9 +34,9 @@ Group Members: Jay En, Jovi, Priyanka, Timothy, Yun Feng (NUS)
 2. Install 
 3. Change the directory to the frontend, and then use vite to run the dev build:
 
-\`\`\`bash
+```bash
 cd frontend
 npm run dev
-\`\`\`
+```
 
 IMPORTANT: DO NOT COMMIT .ENV FILE. DO NOT. NO. NO.

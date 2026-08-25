@@ -8,11 +8,14 @@ function PatientProfile(){
     const { careRecipient, loading } = getCareRecipientInfo();
 
     const firstName = careRecipient?.recipientInfo.profile.first_name;
-    console.log(loading + " " + firstName);
 
     return(
         <div className="PatientProfile">
-            <p>patient is {loading ? "no name": firstName}</p>
+            <div className="TitleBar">
+                <h1>{loading ? "" : firstName}'s Health Info</h1>
+            </div>
+            
+            
         </div>
     );
 }
