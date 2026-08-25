@@ -22,3 +22,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Other things
+.env
+Ignite Training Session 2/
+venv/
+__pycache__/
+.DS_Store
+*.zip
+build/
+dist/
+*.zip
+layer-app/
+layer-aws/
+layer-data/
+layer-otel/
+frontend/node_modules/
