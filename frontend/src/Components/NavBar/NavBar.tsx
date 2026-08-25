@@ -5,7 +5,7 @@ import { BsHouse , BsFillHouseFill  } from "react-icons/bs";
 import { FaRegCalendarAlt, FaCalendarAlt } from "react-icons/fa";
 import { IoCheckboxOutline, IoCheckbox  } from "react-icons/io5";
 import { BsFileEarmarkPerson, BsFillFileEarmarkPersonFill  } from "react-icons/bs";
-import { BsChatLeftDots, BsChatLeftDotsFill  } from "react-icons/bs";
+import { BsChatDots, BsChatDotsFill } from "react-icons/bs";
 
 import './NavBar.css';
 
@@ -48,7 +48,7 @@ function NavBar() {
         <div className = "ChatContainer">
             <NavLink to="/chat" className={({ isActive }) => (isActive ? 'ChatButton active' : 'ChatButton nonactive')}>
             {({ isActive }) =>
-                isActive ? <BsChatLeftDotsFill size="1.75rem" /> : <BsChatLeftDots size="1.75rem" />
+                isActive ? <BsChatDotsFill size="1.75rem" /> : <BsChatDots size="1.75rem" />
             }
             </NavLink>
         </div>

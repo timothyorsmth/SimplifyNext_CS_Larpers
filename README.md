@@ -33,6 +33,7 @@ Group Members: Jay En, Jovi, Priyanka, Timothy, Yun Feng (NUS)
 1. Install Node.js uhhh react and vite :P
 2. Install 
 3. Change the directory to the frontend, and then use vite to run the dev build:
+
 \`\`\`bash
 cd frontend
 npm run dev
