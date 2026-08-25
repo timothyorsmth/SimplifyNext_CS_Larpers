@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { fetchUserData } from '../API/careCircleData.tsx';
+import { fetchUserData } from '../API/CareCircleData';
 
 // What we import from the JSON file
 // MUST MATCH JSON DATA
@@ -15,14 +15,12 @@ type CaregiverData = {
 
 // What the other files reference
 type CaregiverContextValue = {
-  recipientId: string | null;
-  caregivers: CaregiverData[];
   activeCaregiverId: string | null;
-  activeCaregiver: CaregiverData | null;
-  setActiveCaregiverId: React.Dispatch<React.SetStateAction<string | null>>;
+  activeCaregiver: CaregiverData | null; // for dev purposes only, remove for better data abstraction
   activeCaregiverFirstName: string | null;
   activeCaregiverLastName: string | null;
   activeCaregiverPFPUrl: string | null;
+  recipientId: string | null;
   loading: boolean;
 };
 
@@ -34,37 +32,33 @@ const CaregiverContext = createContext<CaregiverContextValue | null>(null);
 export function CaregiverProvider({ children }: { children: React.ReactNode }) {
   // Not supposed to be in the full application if we do scale this
   // But for the demo since we only have 2 users, we can like lowkirkenuinely cheat this
-  const [caregivers, setCaregivers] = useState<CaregiverData[]>([]);
-  const [activeCaregiverId, setActiveCaregiverId] = useState<string | null>(null);
+  const [currentCaregiver, setCurrentCaregiver] = useState<CaregiverData>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
       fetchUserData().then((users) => {
-          setCaregivers(users);
-          setActiveCaregiverId(users[0]?.id ?? null); // default to first user
+          setCurrentCaregiver(users[0] ?? null); // default to first user
           setLoading(false);
       });
   }, []);
   
   // Run ONLY if loading is done
   if (loading == false) {
-    const activeCaregiver = caregivers.find((u) => u.id === activeCaregiverId) ?? null;
+    const firstName = currentCaregiver?.profile.first_name ?? null;
+    const lastName = currentCaregiver?.profile.last_name ?? null;
+    const activeCaregiverPFPUrl = currentCaregiver?.profile_picture_url ?? null;
+    const activeCaregiverId = currentCaregiver?.id ?? null;
 
-    const activeCaregiverFirstName = activeCaregiver?.profile.first_name ?? null;
-    const activeCaregiverLastName = activeCaregiver?.profile.last_name ?? null;
-    const activeCaregiverPFPUrl = activeCaregiver?.profile_picture_url ?? null;
 
     // Set current user values :)
     const value: CaregiverContextValue = {
-        caregivers,
-        activeCaregiverId,
-        activeCaregiver,
-        setActiveCaregiverId,
-        activeCaregiverFirstName,
-        activeCaregiverLastName,
-        activeCaregiverPFPUrl,
-        recipientId: activeCaregiver?.recipientId ?? null,
-        loading,
+      activeCaregiverId: activeCaregiverId ?? null,
+      activeCaregiver: currentCaregiver ?? null,
+      activeCaregiverFirstName: firstName ?? "",
+      activeCaregiverLastName: lastName ?? "",
+      activeCaregiverPFPUrl,
+      recipientId: currentCaregiver?.recipientId ?? null,
+      loading,
     };
 
     // Return the providers
@@ -79,7 +73,7 @@ export function CaregiverProvider({ children }: { children: React.ReactNode }) {
 export function getCaregiverInfo() {
   const context = useContext(CaregiverContext);
   if (!context) {
-    throw new Error('useCaregiver must be used within a CaregiverProvider');
+    throw new Error('getCaregiverInfo must be used within a CaregiverProvider');
   }
   return context;
 }

@@ -2,13 +2,17 @@
 import './PatientProfile.css';
 
 // Import context
-
+import { getCareRecipientInfo } from '../../Context/CareRecipientContext';
 
 function PatientProfile(){
+    const { careRecipient, loading } = getCareRecipientInfo();
+
+    const firstName = careRecipient?.recipientInfo.profile.first_name;
+    console.log(loading + " " + firstName);
 
     return(
         <div className="PatientProfile">
-            <p>Patient Profile shows up here</p>
+            <p>patient is {loading ? "no name": firstName}</p>
         </div>
     );
 }
