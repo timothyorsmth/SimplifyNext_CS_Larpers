@@ -36,3 +36,7 @@ Group Members: Jay En, Jovi, Priyanka, Timothy, Yun Feng (NUS)
 ---
 1. Install Node.js
 2. Install 
+X. ''' cd frontend '''
+Y. ''' npm dev run ''' to run the program
+
+IMPORTANT: DO NOT COMMIT .ENV FILE. DO NOT. NO. NO.
