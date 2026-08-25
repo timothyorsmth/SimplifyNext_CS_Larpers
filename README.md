@@ -30,8 +30,13 @@ Group Members: Jay En, Jovi, Priyanka, Timothy, Yun Feng (NUS)
 - An AWS account with Bedrock model access enabled in your target region
 
 ## Setup Guide
-1. Install Node.js uhhh react and vite :P
-2. Install 
+1. Install Node.js 
+2. run 
+
+``` bash
+npm install
+```
+
 3. Change the directory to the frontend, and then use vite to run the dev build:
 
 ```bash
