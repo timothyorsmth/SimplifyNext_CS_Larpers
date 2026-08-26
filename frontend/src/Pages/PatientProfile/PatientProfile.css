@@ -2,3 +2,35 @@
     margin: 5vw;
     margin-top: 5vh;
 }
+
+.TitleBar {
+    display:grid;
+    grid-template-columns: 5fr 1fr;
+    align-items: baseline;
+}
+
+.ExportInfo {
+    color: var(--color--dark);
+    justify-self: end;
+}
+
+.heading {
+    margin-bottom: 1vh;
+}
+
+.attribute {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--color-green);
+}
+
+.dataField {
+    font-size: 0.8rem;
+}
+
+.InfoBox {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+}

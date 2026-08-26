@@ -1,10 +1,11 @@
 /* Design tokens (basically like constants that we reference) */
 :root {
-    --colour-light: #f8f4f1;
-    --colour-dark: #354947;
+    --colour-light: #fff6ef;
+    --colour-dark: #11354e;
     --colour-grey: #e0dcd1;
-    --colour-blue: #d6e3e9;
-    --colour-green: #e5e3bd;
+    --colour-yellow: #fbb316;
+    --colour-darkgreen: #739b4d;
+    --colour-green: #cdd692;
 
     /* For warnings and shit */
     --colour-warning: #f4d68d;
