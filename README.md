@@ -34,9 +34,11 @@ Group Members: Jay En, Jovi, Priyanka, Timothy, Yun Feng (NUS)
 2. create a virtual environment and install python dependencies 
 
 ``` bash
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate 
 pip install -r requirements.txt
 ```
+(note if source doesn't work you can activate the virtual environment through VScode. google it.)
+
 3. Configure AWS access keys :D
 
 4. Run the backend
