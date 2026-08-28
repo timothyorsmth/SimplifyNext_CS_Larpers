@@ -8,4 +8,8 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
+  server: {
+    port: 8000,
+    strictPort: true, // Optional: true throws an error if the port is already in use instead of automatically trying the next available port
+  }
 })
