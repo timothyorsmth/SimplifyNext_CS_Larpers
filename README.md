@@ -41,7 +41,7 @@ pip install -r requirements.txt
 4. Run the backend
 
 ``` bash
-uvicorn backend.main:app --reload
+uvicorn backend.main:app --reload --port 5000
 ```
 
 Visit http://127.0.0.1:8000/docs for interactive API docs

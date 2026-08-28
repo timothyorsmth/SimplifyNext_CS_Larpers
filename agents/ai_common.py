@@ -1,5 +1,8 @@
 """
-Honestly like idk but! 
+Common dependencies / information that claude asks for, 
+we put it here so we dont have to keep retyping it
+
+Idk what the functions do..
 The tutorials had these so i have these also ¯_(ツ)_/¯
 
 Might kill myself after this though idk
@@ -15,6 +18,7 @@ load_dotenv()
 
 # constants
 MAX_TOKENS = 300
+ANTHROPIC_VERSION = "bedrock-2023-05-31"
 
 # import information from env file
 MODEL_ID = os.environ.get(

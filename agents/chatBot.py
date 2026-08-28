@@ -1,19 +1,22 @@
+'''
+
+add some comments about what this bot does
+
+'''
 
 import json
-from agents import ai_common
+import ai_common
 
-QUESTION = "In one sentence: what is Amazon Bedrock?"
-
-def testQuestion():
+def chatPrompt(userPrompt: str):
     client = ai_common.bedrock_runtime()
-
+    
     body = json.dumps({
         # 1. A fixed Bedrock literal. NOT your model's version, and not
         #    optional. Every Anthropic-on-Bedrock request carries it.
         "anthropic_version": ai_common.ANTHROPIC_VERSION,
 
         # 2. The conversation. Roles must alternate user/assistant.
-        "messages": [{"role": "user", "content": QUESTION}],
+        "messages": [{"role": "user", "content": userPrompt}],
 
         # 3. Required on Bedrock, unlike Anthropic's first-party API.
         #    Caps OUTPUT only — it is not a budget for the whole call.
@@ -29,7 +32,7 @@ def testQuestion():
         contentType="application/json",
         accept="application/json",
     )
-
+    
     # The response body is a STREAMING object. .read() it before json.loads,
     # or you get "Object of type StreamingBody is not JSON serializable".
     envelope = json.loads(response["body"].read())
@@ -45,7 +48,8 @@ def testQuestion():
     return envelope['content'][0]['text'].strip()
 
 def main() -> None:
-    testQuestion()
+    userInput = input("Please ask a question: ")
+    chatPrompt(userInput)
 
 if __name__ == "__main__":
     main()
