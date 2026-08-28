@@ -1,0 +1,6 @@
+# put in any dependencies that you want to install
+# run " pip install requirements.txt "
+
+boto3
+pytest
+python-dotenv
