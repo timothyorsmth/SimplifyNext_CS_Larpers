@@ -11,7 +11,7 @@ from pathlib import Path
 app = FastAPI()
 
 origins = [
-    "https://localhost:8000" # for production :)
+    "http://localhost:8000" # for production :)
 ]
 
 # Configure CORS for your Vite frontend development server
@@ -23,12 +23,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/chat")
-def generate_report():
-    print("running???")
+class ChatRequest(BaseModel):
+    promptStr: str
 
-    result = {"response": f"{testQuestion()}"}
-    return result
+@app.post("/chat")
+def chat(req: ChatRequest):
+    print("running???")
+    try:
+        result = testQuestion()  # or however your logic takes the prompt
+        return {"response": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")
 def read_root():

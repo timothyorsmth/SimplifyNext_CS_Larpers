@@ -24,10 +24,7 @@ Group Members: Jay En, Jovi, Priyanka, Timothy, Yun Feng (NUS)
 
 ## Prerequisites
 - Node.js (v18+) and npm
-- Python 3.11+
-- AWS CLI, configured with credentials (`aws configure`)
-- AWS SAM CLI (for deploying the Lambda backend)
-- An AWS account with Bedrock model access enabled in your target region
+- Python 3.14+
 
 ## Setup Guide
 1. Install Node.js and Python (from their respective websites)

@@ -1,11 +1,12 @@
 
 import json
-from ai_common import MODEL_ID, MAX_TOKENS, REGION, bedrock_runtime
+# from ai_common import MODEL_ID, MAX_TOKENS, REGION, bedrock_runtime
+from agents import ai_common
 
 QUESTION = "In one sentence: what is Amazon Bedrock?"
 
 def testQuestion():
-    client = bedrock_runtime()
+    client = ai_common.bedrock_runtime()
 
     body = json.dumps({
         # 1. A fixed Bedrock literal. NOT your model's version, and not
@@ -17,14 +18,14 @@ def testQuestion():
 
         # 3. Required on Bedrock, unlike Anthropic's first-party API.
         #    Caps OUTPUT only — it is not a budget for the whole call.
-        "max_tokens": MAX_TOKENS,
+        "max_tokens": ai_common.MAX_TOKENS,
 
         # 4. Not required, but always set it. The default is not 0.
         "temperature": 0,
     })
 
     response = client.invoke_model(
-        modelId=MODEL_ID,
+        modelId=ai_common.MODEL_ID,
         body=body,                       # a JSON *string*, not a dict
         contentType="application/json",
         accept="application/json",
