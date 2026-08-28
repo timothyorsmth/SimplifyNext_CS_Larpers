@@ -6,8 +6,7 @@ def list_bedrock_models():
     try:
         # Create a session with your SSO profile
         session = boto3.Session(
-            profile_name='myisb01_IsbUsersPS-371061166839',
-            region_name='us-east-1'
+            
         )
         
         # Create Bedrock client

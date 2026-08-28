@@ -18,7 +18,7 @@ MAX_TOKENS = 300
 
 # import information from env file
 MODEL_ID = os.environ.get(
-    "BEDROCK_MODEL", "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+    "BEDROCK_MODEL", "anthropic.claude-haiku-4-5-20251001-v1:0"
 )
 REGION = os.environ.get("AWS_DEFAULT_REGION") or os.environ.get(
     "AWS_REGION", "ap-southeast-1"
