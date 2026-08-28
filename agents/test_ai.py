@@ -4,8 +4,7 @@ from ai_common import MODEL_ID, MAX_TOKENS, REGION, bedrock_runtime
 
 QUESTION = "In one sentence: what is Amazon Bedrock?"
 
-
-def main() -> None:
+def testQuestion():
     client = bedrock_runtime()
 
     body = json.dumps({
@@ -43,6 +42,10 @@ def main() -> None:
     print(f"  text:        {envelope['content'][0]['text'].strip()}")
     print(f"  stop_reason: {envelope['stop_reason']}")
 
+    return envelope['content'][0]['text'].strip()
+
+def main() -> None:
+    testQuestion()
 
 if __name__ == "__main__":
     main()
