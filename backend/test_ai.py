@@ -1,8 +1,7 @@
 
 import json
-from common import MODEL_ID, REGION, bedrock_runtime
+from ai_common import MODEL_ID, MAX_TOKENS, REGION, bedrock_runtime
 
-MAX_TOKENS = 300
 QUESTION = "In one sentence: what is Amazon Bedrock?"
 
 

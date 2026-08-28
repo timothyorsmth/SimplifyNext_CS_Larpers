@@ -13,6 +13,9 @@ from pathlib import Path
 
 load_dotenv()
 
+# constants
+MAX_TOKENS = 300
+
 # import information from env file
 MODEL_ID = os.environ.get(
     "BEDROCK_MODEL", "global.anthropic.claude-haiku-4-5-20251001-v1:0"
