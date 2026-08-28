@@ -30,18 +30,30 @@ Group Members: Jay En, Jovi, Priyanka, Timothy, Yun Feng (NUS)
 - An AWS account with Bedrock model access enabled in your target region
 
 ## Setup Guide
-1. Install Node.js 
-2. run 
+1. Install Node.js and Python (from their respective websites)
+2. create a virtual environment and install python dependencies 
 
 ``` bash
-npm install
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+```
+3. Configure AWS access keys :D
+
+4. Run the backend
+
+``` bash
+uvicorn backend.main:app --reload
 ```
 
-3. Change the directory to the frontend, and then use vite to run the dev build:
+Visit http://127.0.0.1:8000/docs for interactive API docs
+
+5. [On a separate terminal] Change the directory to the frontend, and then use vite to run the dev build:
 
 ```bash
 cd frontend
-npm run dev
+npm run 
 ```
+
+6. To kill the individual terminals, press ctrl + C :P
 
 IMPORTANT: DO NOT COMMIT .ENV FILE. DO NOT. NO. NO.

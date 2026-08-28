@@ -4,3 +4,4 @@
 boto3
 pytest
 python-dotenv
+fastapi[standard]
