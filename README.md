@@ -28,11 +28,13 @@ Group Members: Jay En, Jovi, Priyanka, Timothy, Yun Feng (NUS)
 
 ## Setup Guide
 1. Install Node.js and Python (from their respective websites)
-2. create a virtual environment and install python dependencies 
+2. create a virtual environment and install python and Node JS dependencies 
 
 ``` bash
 python -m venv .venv && source .venv/bin/activate 
 pip install -r requirements.txt
+
+npm install
 ```
 (note if source doesn't work you can activate the virtual environment through VScode. google it.)
 
