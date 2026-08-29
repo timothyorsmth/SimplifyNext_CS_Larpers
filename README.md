@@ -50,7 +50,7 @@ Visit http://127.0.0.1:8000/docs for interactive API docs
 
 ```bash
 cd frontend
-npm run 
+npm run dev
 ```
 
 6. To kill the individual terminals, press ctrl + C :P
