@@ -9,8 +9,10 @@ Might kill myself after this though idk
 
 """
 
+# import dependencies
 import os
 import sys
+import json
 from dotenv import load_dotenv, find_dotenv
 from pathlib import Path
 
@@ -18,6 +20,7 @@ load_dotenv()
 
 # constants
 MAX_TOKENS = 300
+
 ANTHROPIC_VERSION = "bedrock-2023-05-31"
 
 # import information from env file
@@ -65,3 +68,24 @@ def bedrock_runtime():
             retries={"max_attempts": 1},
         ),
     )
+
+def invoke_claude(system_prompt: str, user_content: str, max_tokens: int = MAX_TOKENS) -> str:
+    """
+    The actual call to Bedrock. Every agent (chat, reports, etc.) should
+    route through this instead of building its own boto3 client, so the
+    timeout/retry config and model ID only live in one place.
+    """
+    client = bedrock_runtime()
+
+    response = client.invoke_model(
+        modelId=MODEL_ID,
+        body=json.dumps({
+            "anthropic_version": ANTHROPIC_VERSION,
+            "max_tokens": max_tokens,
+            "system": system_prompt,
+            "messages": [{"role": "user", "content": user_content}],
+        }),
+    )
+
+    body = json.loads(response["body"].read())
+    return body["content"][0]["text"]

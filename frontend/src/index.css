@@ -2,6 +2,7 @@
 :root {
     --colour-light: #fff6ef;
     --colour-dark: #11354e;
+    --colour-darkish: #636363;
     --colour-grey: #e0dcd1;
     --colour-yellow: #fbb316;
     --colour-darkgreen: #739b4d;
@@ -42,7 +43,11 @@ body {
   -webkit-font-smoothing: antialiased;
   color: var(--colour-dark);
   background: var(--colour-light);
+
+  
 }
+
+
 
 /* Make buttons look prettier */
 button, input, textarea, select {
