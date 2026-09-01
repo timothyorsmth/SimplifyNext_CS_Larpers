@@ -5,8 +5,10 @@ import { useState, useEffect, useRef } from "react";
 import './Chat.css';
 import ChatBubble from './ChatBubble';
 import type { ChatMessage, ChatAction } from './ChatBubble';
+import { FaTrashCan } from "react-icons/fa6";
 
 import { API_BASE } from '../../App'
+import { useChat } from "../../Context/ChatContext";
 
 
 interface SuggestedActions {
@@ -59,7 +61,7 @@ export async function sendChatMessage(promptStr: string): Promise<ChatApiRespons
 
 function Chat() {
   // states for chat messages
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const { messages, setMessages, clearMessages } = useChat();
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -174,6 +176,9 @@ function Chat() {
           />
           <button type="submit" className="chatSend" disabled={isSending || !input.trim()}>
             Send
+          </button>
+          <button type="button" className="clearMessages" onClick={clearMessages}>
+            <FaTrashCan />
           </button>
         </form>
       </div>

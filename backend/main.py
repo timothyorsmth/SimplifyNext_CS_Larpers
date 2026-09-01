@@ -14,7 +14,8 @@ origins = [
     "http://localhost:8000" # for production,, MUST MATCH VITE !!!
 ]
 
-# Configure CORS for your Vite frontend development server
+# Configure CORS for Vite frontend development server
+# Not gonna lie i actually dk what this does
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # Default Vite port
@@ -23,10 +24,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
+# For chat bot :)
 class ChatRequest(BaseModel):
     promptStr: str
 
-# For chat bot :)
 @app.post("/chat", response_model=ChatResponse)
 def chat(payload: ChatRequest):
     try:
@@ -36,6 +39,7 @@ def chat(payload: ChatRequest):
         print(f"ERROR: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Test server get function, does not actually do anything
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
