@@ -14,8 +14,8 @@
     "id": "user_00002",
     "email": "julia@example.com",
     "profile": {
-      "first_name": "Julia",
-      "last_name": "Tan Jia Yok"
+      "first_name": "Wei Jie",
+      "last_name": "Tan"
     },
     "recipientId": "recp_00001",
     "preferences": { "notifications": true },

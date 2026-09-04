@@ -16,6 +16,7 @@ interface SuggestedActions {
   label: string;
 }
 
+// TODO: add functionality to handle suggested actions
 const SUGGESTEDACTIONS: SuggestedActions[] = [
   { id: 'generate-report', label: 'Generate Report' },
   { id: 'new-daily-actions', label: 'New Daily Actions' },

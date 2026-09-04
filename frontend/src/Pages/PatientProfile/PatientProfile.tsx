@@ -12,6 +12,9 @@ function PatientProfile(){
     const firstName = careRecipient?.recipientInfo.profile.first_name;
     const lastName = careRecipient?.recipientInfo.profile.last_name;
 
+    // TODO: format the page to include more information
+    // Refer to CareRecipientContext to add more info
+    
     return(
         <div className="PatientProfile">
             <div className="TitleBar">

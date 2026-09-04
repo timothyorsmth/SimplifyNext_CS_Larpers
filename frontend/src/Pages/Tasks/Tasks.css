@@ -1,0 +1,223 @@
+.tasksPage {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 24px 20px 32px;
+  min-height: 100vh;
+}
+ 
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 36px;
+  color: var(--colour-dark, #1a1a1a);
+}
+ 
+
+/* Incomplete Task Section*/
+.incompleteTaskCard {
+  background: var(--colour-warning);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+ 
+.incompleteTaskLabel{
+  font-weight: 700;
+  font-size: 14px;
+}
+ 
+.incompleteTaskContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+ 
+.incompleteTaskName {
+  font-weight: 700;
+}
+ 
+.incompleteTaskTag {
+  font-size: 13px;
+}
+
+.white {
+  color: var(--colour-light);
+}
+ 
+.taskRows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+ 
+.taskContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-neutral-100, #ececec);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+ 
+.taskName {
+  flex: 1;
+  font-weight: 600;
+  color: var(--color-text, #1a1a1a);
+}
+ 
+.taskPersonAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+ 
+.taskName {
+  font-weight: 600;
+}
+ 
+.taskIcon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+ 
+.taskCreateButton {
+  margin-top: 28px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: var(--colour-grey, #d9d9d9);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+ 
+/* --- Modal --- */
+ 
+.taskPopupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+ 
+.taskPopup {
+  width: 90%;
+  max-width: 360px;
+  background: var(--colour-grey, #ececec);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+ 
+.taskPopupRow {
+  display: flex;
+  gap: 10px;
+}
+ 
+.taskPopupLabel {
+  align-items: center;
+  justify-content: space-between;
+}
+ 
+.taskInputName {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: none;
+  background: #ffffff;
+  font-size: 15px;
+}
+ 
+.taskIconButton {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  background: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+ 
+.taskPopupLabel {
+  font-weight: 700;
+  font-size: 14px;
+}
+ 
+.taskPopupTime {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: none;
+  background: #ffffff;
+  font-weight: 600;
+}
+
+.taskPopupDateTimeGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.taskPopupDate {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: none;
+  background: #ffffff;
+  font-weight: 600;
+}
+ 
+.taskPopupSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+ 
+.taskPopupPillGroup {
+  display: flex;
+  gap: 8px;
+}
+ 
+.taskPopupPill {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 12px;
+  background: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+ 
+.taskPopupPill--active {
+  background: #5c5c5c;
+  color: #ffffff;
+}
+ 
+.taskPopupAssign {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: none;
+  background: #ffffff;
+  font-weight: 600;
+}
+ 
+.taskPopupCreateButton {
+  align-self: flex-end;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 12px;
+  background: #5c5c5c;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}

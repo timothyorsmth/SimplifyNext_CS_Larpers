@@ -26,40 +26,29 @@ type CareRecipientContextValue = {
 const CareRecipientContext = createContext<CareRecipientContextValue | null>(null);
 
 export function CareRecipientProvider({ children }: { children: React.ReactNode }) {
-    const [careRecipient, setCareRecipient] = useState<CareRecipientData>();
+    const [careRecipient, setCareRecipient] = useState<CareRecipientData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchCareRecipientData().then((recipientData) => {
-            // finish loading data
-            setCareRecipient(recipientData ?? null); // set fallback
+            setCareRecipient(recipientData ?? null);
             setLoading(false);
-        })
-    });
+        });
+    }, []);
 
-    if (loading == false) {
-        const careRecipientId = careRecipient?.recipientInfo.id;
-        const firstName = careRecipient?.recipientInfo.profile.first_name;
-        const lastName = careRecipient?.recipientInfo.profile.last_name;
+    const value: CareRecipientContextValue = {
+        careRecipient,
+        recipientId: careRecipient?.recipientInfo.id ?? '',
+        careRecipientFirstName: careRecipient?.recipientInfo.profile.first_name ?? '',
+        careRecipientLastName: careRecipient?.recipientInfo.profile.last_name ?? '',
+        loading,
+    };
 
-        console.log(firstName);
-
-        // set care recipient values
-        const value: CareRecipientContextValue = {
-            careRecipient: careRecipient ?? null,
-            recipientId: careRecipientId ?? '',
-            careRecipientFirstName: firstName ?? '',
-            careRecipientLastName: lastName ?? '',
-            loading: loading ?? false
-        }
-
-        // Return the provider 
-        return (
-            <CareRecipientContext.Provider value = {value}>
-                { children }
-            </CareRecipientContext.Provider>
-        )
-    }
+    return (
+        <CareRecipientContext.Provider value={value}>
+            {children}
+        </CareRecipientContext.Provider>
+    );
 }
 
 export function getCareRecipientInfo() {

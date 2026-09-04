@@ -36,7 +36,7 @@ pip install -r requirements.txt
 
 npm install
 ```
-(note if source doesn't work you can activate the virtual environment through VScode. google it.)
+(note if source doesn't work you can activate the virtual environment through VScode (google it))
 
 3. Configure AWS access keys :D
 

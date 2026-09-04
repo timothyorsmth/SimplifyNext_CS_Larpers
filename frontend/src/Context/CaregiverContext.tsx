@@ -24,6 +24,9 @@ type CaregiverContextValue = {
   loading: boolean;
 };
 
+// Hardcoded for demo purposes — swap this to real auth/session logic later
+const CURRENT_USER_ID = "user_00001";
+
 // A context is a way to pass information to different files
 // Priyanka lmk if this is like the correct way to use this because im legit dont knows
 const CaregiverContext = createContext<CaregiverContextValue | null>(null);
@@ -36,10 +39,13 @@ export function CaregiverProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-      fetchUserData().then((users) => {
-          setCurrentCaregiver(users[0] ?? null); // default to first user
-          setLoading(false);
-      });
+      fetchUserData().then((users: CaregiverData[]) => {
+      const matched = users.find((u) => u.id === CURRENT_USER_ID);
+      // Falls back to the first user if the hardcoded id doesn't match anything,
+      // so a typo'd id doesn't silently break the whole app during the demo
+      setCurrentCaregiver(matched ?? users[0] ?? null);
+      setLoading(false);
+    });
   }, []);
   
   // Run ONLY if loading is done
@@ -62,6 +68,7 @@ export function CaregiverProvider({ children }: { children: React.ReactNode }) {
     };
 
     // Return the providers
+    // Don't actually know what this does  ¯\_(ツ)_/¯
     return (
         <CaregiverContext.Provider value={value}>
         {children}
