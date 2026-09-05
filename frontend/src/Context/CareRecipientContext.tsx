@@ -2,24 +2,52 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { fetchCareRecipientData } from '../API/CareCircleData'
 
 // Things to import from JSON data
-type CareRecipientData = {
+type MedicalHistoryEntry = {
+    id: string;
+    condition: string;
+    diagnosedDate: string;
+    status: string;
+    notes: string | null;
+};
+
+type Medication = {
+    id: string;
+    name: string;
+    dosage: string;
+    frequency: string;
+    startDate: string;
+    endDate: string | null;
+    status: string;
+    prescribedFor: string | null;
+};
+
+type Appointment = {
+    id: string,
+    type: string,
+    date: string | null,
+    provider: string,
+    location: string,
+    status: string,
+    notes: string | null
+};
+
+export type CareRecipientData = {
     recipientInfo: {
         id: string;
         profile: {
-            first_name: string
-            last_name: string
-        }
-    }
-    appointments: {
-        id: string,
-        type: string,
-        date: string | null,
-        provider: string,
-        location: string,
-        status: string,
-        notes: string | null
-    }[]
-}
+            first_name: string;
+            last_name: string;
+        };
+        dateOfBirth: string;
+        sex: string;
+        bloodType: string;
+        allergies: string[];
+        primaryPhysician: string;
+    };
+    medicalHistory: MedicalHistoryEntry[];
+    medications: Medication[];
+    appointments: Appointment[];
+};
 
 // Values that the other files reference
 type CareRecipientContextValue = {
@@ -61,10 +89,10 @@ export function CareRecipientProvider({ children }: { children: React.ReactNode 
     );
 }
 
-export function getCareRecipientInfo() {
+export function useCareRecipientInfo() {
     const context = useContext(CareRecipientContext);
     if (!context) {
-        throw new Error('getCareRecipientInfo must be used within a CareRecipientProvider');
+        throw new Error('useCareRecipientInfo must be used within a CareRecipientProvider');
     }
     return context;
 }
