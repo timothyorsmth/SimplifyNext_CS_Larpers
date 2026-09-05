@@ -21,6 +21,7 @@ type CaregiverContextValue = {
   activeCaregiverLastName: string | null;
   activeCaregiverPFPUrl: string | null;
   recipientId: string | null;
+  caregivers: CaregiverData[]; // NEW — everyone in the circle
   loading: boolean;
 };
 
@@ -36,10 +37,15 @@ export function CaregiverProvider({ children }: { children: React.ReactNode }) {
   // Not supposed to be in the full application if we do scale this
   // But for the demo since we only have 2 users, we can like lowkirkenuinely cheat this
   const [currentCaregiver, setCurrentCaregiver] = useState<CaregiverData>();
+  // This is the list of all caregivers
+  // If we make this a full application this is not supposed to be here
+  // But for demo we can like just cheat and have this here blehhhhh
+  const [caregivers, setCaregivers] = useState<CaregiverData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
       fetchUserData().then((users: CaregiverData[]) => {
+      setCaregivers(users);           // keep everyone, not just the match
       const matched = users.find((u) => u.id === CURRENT_USER_ID);
       // Falls back to the first user if the hardcoded id doesn't match anything,
       // so a typo'd id doesn't silently break the whole app during the demo
@@ -55,6 +61,7 @@ export function CaregiverProvider({ children }: { children: React.ReactNode }) {
     const activeCaregiverPFPUrl = currentCaregiver?.profile_picture_url ?? null;
     const activeCaregiverId = currentCaregiver?.id ?? null;
 
+    console.log(caregivers);
 
     // Set current user values :)
     const value: CaregiverContextValue = {
@@ -64,6 +71,7 @@ export function CaregiverProvider({ children }: { children: React.ReactNode }) {
       activeCaregiverLastName: lastName ?? "",
       activeCaregiverPFPUrl,
       recipientId: currentCaregiver?.recipientId ?? null,
+      caregivers: caregivers ?? [],
       loading,
     };
 

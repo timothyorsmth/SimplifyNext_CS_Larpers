@@ -1,7 +1,11 @@
 @import url("../../index.css");
 
+:root {
+  --navBarHeight: 10vh;
+}
+
 .navPanel {
-  height: 10vh;
+  height: var(--navBarHeight);
   width: 100%;
 
   position: fixed;
@@ -61,7 +65,7 @@
 }
 
 .active {
-  background-color: var(--colour-dark); 
+  background-color: var(--colour-darkgreen); 
   color: var(--colour-light);
 
   transition: 0.3s;

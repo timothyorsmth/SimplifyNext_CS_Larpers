@@ -7,6 +7,7 @@ import type { IconType } from "react-icons";
 import { FiUser } from "react-icons/fi";
 import { FaPills, FaCar } from "react-icons/fa";
 import { getCareRecipientInfo } from "../../Context/CareRecipientContext";
+import { getCaregiverInfo } from '../../Context/CaregiverContext';
 
 // Import context
 
@@ -35,7 +36,7 @@ const INITIAL_TASKS: Task[] = [
     id: "t1",
     name: "Morning Meds",
     icon: "pill",
-    finishDate: "2026-09-04",
+    finishDate: "2024-09-04",
     finishBefore: "09:00",
     repeat: "daily",
     assignedTo: "Elenor Siew",
@@ -46,7 +47,7 @@ const INITIAL_TASKS: Task[] = [
     id: "t2",
     name: "Night Meds",
     icon: "pill",
-    finishDate: "2026-09-04",
+    finishDate: "2028-09-04",
     finishBefore: "21:00",
     repeat: "daily",
     assignedTo: "Elenor Siew",
@@ -57,7 +58,7 @@ const INITIAL_TASKS: Task[] = [
     id: "t3",
     name: "Go to KKH",
     icon: "car",
-    finishDate: "2026-09-04",
+    finishDate: "2029-09-04",
     finishBefore: "14:00",
     repeat: "never",
     assignedTo: "Tan Wei Jie",
@@ -93,6 +94,14 @@ function CreateTaskPopup({
     () => new Date().toISOString().split("T")[0] // defaults to today, "YYYY-MM-DD"
   );
   const [finishBefore, setFinishBefore] = useState("12:00");
+
+  // Keep the selected assignee valid as the real caregiver list arrives
+  // (assignablePeople starts empty while CaregiverContext is still loading)
+  useEffect(() => {
+    if (!assignablePeople.includes(assignedTo)) {
+      setAssignedTo(assignablePeople[0] ?? "");
+    }
+  }, [assignablePeople]);
  
   if (!isOpen) return null;
  
@@ -199,6 +208,7 @@ function CreateTaskPopup({
 
 function Tasks() {
   const { careRecipient } = getCareRecipientInfo(); 
+  const { caregivers } = getCaregiverInfo();
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -243,9 +253,9 @@ function Tasks() {
   const incompleteTasks = effectiveTasks.find((t) => t.overdue);
   const otherTasks = effectiveTasks.filter((t) => t !== incompleteTasks);
  
-  const assignablePeople = [
-    careRecipient?.recipientInfo.profile.first_name + " " + careRecipient?.recipientInfo.profile.last_name
-  ].filter((v, i, arr): v is string => !!v && arr.indexOf(v) === i);
+  const assignablePeople = caregivers
+    .filter((c) => c.recipientId === careRecipient?.recipientInfo.id) // only people caring for this recipient
+    .map((c) => `${c.profile.first_name} ${c.profile.last_name}`);
  
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed">) => {
     setTasks((prev) => [
@@ -254,18 +264,33 @@ function Tasks() {
     ]);
     // TODO: POST to backend / write to mock JSON via api/ layer
   };
+
+  const toggleTaskCompleted = (id: string) => {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+    );
+    // TODO: persist to backend / mock JSON once that layer exists
+  };
  
   return (
     <div className="tasksPage">
       <h1 className="title">Today's Tasks</h1>
  
       {incompleteTasks && (() => {
-        // ICON_MAP values are components, so grab one, capitalize the
-        // reference, then render it as JSX (<Icon />) — you can't put a
-        // component reference directly into JSX like {ICON_MAP[key]}.
         const HighlightIcon = ICON_MAP[incompleteTasks.icon];
         return (
-          <div className="incompleteTaskCard">
+          <div
+            className="incompleteTaskCard"
+            onClick={() => toggleTaskCompleted(incompleteTasks.id)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggleTaskCompleted(incompleteTasks.id);
+              }
+            }}
+          >
             <span className="incompleteTaskLabel">Incomplete Tasks:</span>
             <div className="incompleteTaskContainer">
               <span className="taskIcon">
@@ -284,7 +309,19 @@ function Tasks() {
         {otherTasks.map((task) => {
           const RowIcon = ICON_MAP[task.icon];
           return (
-            <div key={task.id} className="taskContainer">
+            <div
+              key={task.id}
+              className={`taskContainer${task.completed ? " taskContainer--completed" : ""}`}
+              onClick={() => toggleTaskCompleted(task.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  toggleTaskCompleted(task.id);
+                }
+              }}
+            >
               <span className="taskIcon">{RowIcon && <RowIcon />}</span>
               <span className="taskName">{task.name}</span>
               <span className="taskPersonAvatar" title={task.assignedTo}>

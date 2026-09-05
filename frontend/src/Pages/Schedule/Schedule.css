@@ -1,0 +1,180 @@
+:root {
+  --rowHeight: 56px;
+}
+
+.schedule {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.dayStrip {
+  display: flex;
+  background: var(--colour-darkgreen);
+  padding: 12px 8px;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.3)
+}
+
+.dayCell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--colour-dark);
+  cursor: pointer;
+}
+
+.dayCellSelected {
+  color: var(--colour-light);
+}
+
+.dayMonth {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dayNum {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.todayDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--colour-yellow);
+}
+
+.timeline {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 12px;
+}
+
+.timelineRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+}
+
+.hourLabel {
+  width: 24px;
+  font-size: 14px;
+  color: var(--colour-dark);
+  padding-top: 4px;
+}
+
+.hourLine {
+  flex: 1;
+  border-bottom: 1px solid var(--colour-green);
+  margin-top: 20px;
+}
+
+.eventBlock {
+  position: absolute;
+  left: 44px;
+  right: 0;
+  background: #e2e2e2;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+
+.eventBlockCompleted {
+  opacity: 0.5;
+}
+
+.fab {
+  position: fixed;
+  bottom: calc(var(--navBarHeight) + 16px); /* navBarHeight + gap above it */
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--colour-darkgreen);
+  color: var(--colour-light);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.popup {
+  background: #e8e8e8;
+  border-radius: 12px;
+  padding: 24px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.popupInput {
+  background: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 15px;
+}
+
+.popupRow {
+  display: flex;
+  gap: 8px;
+  min-width: 0; /* allow flex children to shrink below their content size */
+}
+
+.popupInputHalf {
+  flex: 1;
+  min-width: 0; /* without this, date/time inputs ignore flex-shrink and overflow */
+  width: 0; /* forces flex-basis to be calculated instead of using intrinsic input width */
+}
+
+
+.popupSectionLabel {
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.repeatBtn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.repeatBtnActive {
+  background: #555;
+  color: #fff;
+}
+
+.createEventBtn {
+  align-self: flex-end;
+  background: var(--colour-yellow);
+  color: var(--colour-dark);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-top: 8px;
+}

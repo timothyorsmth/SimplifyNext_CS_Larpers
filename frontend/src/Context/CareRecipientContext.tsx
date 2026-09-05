@@ -22,12 +22,13 @@ type Medication = {
 };
 
 type Appointment = {
-    id: string;
-    type: string;
-    date: string;
-    provider: string;
-    status: string;
-    notes: string | null;
+    id: string,
+    type: string,
+    date: string | null,
+    provider: string,
+    location: string,
+    status: string,
+    notes: string | null
 };
 
 export type CareRecipientData = {
@@ -54,6 +55,7 @@ type CareRecipientContextValue = {
     careRecipient: CareRecipientData | null; // for dev purposes, remove for better data abstraction
     careRecipientFirstName: string | null;
     careRecipientLastName: string | null;
+    appointments: CareRecipientData['appointments']; // convenience field, mirrors careRecipient.appointments
     loading: boolean;
 }
 
@@ -73,9 +75,10 @@ export function CareRecipientProvider({ children }: { children: React.ReactNode 
 
     const value: CareRecipientContextValue = {
         careRecipient,
-        recipientId: careRecipient?.recipientInfo?.id ?? null,
-        careRecipientFirstName: careRecipient?.recipientInfo?.profile?.first_name ?? null,
-        careRecipientLastName: careRecipient?.recipientInfo?.profile?.last_name ?? null,
+        recipientId: careRecipient?.recipientInfo.id ?? '',
+        careRecipientFirstName: careRecipient?.recipientInfo.profile.first_name ?? '',
+        careRecipientLastName: careRecipient?.recipientInfo.profile.last_name ?? '',
+        appointments: careRecipient?.appointments ?? [], // default to [] so consumers can .map/.filter without a null check
         loading,
     };
 

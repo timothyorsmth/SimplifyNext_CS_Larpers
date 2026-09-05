@@ -19,6 +19,7 @@
   border-radius: 16px;
   padding: 16px;
   margin-bottom: 16px;
+  cursor: pointer;
 }
  
 .incompleteTaskLabel{
@@ -58,6 +59,12 @@
   background: var(--color-neutral-100, #ececec);
   border-radius: 16px;
   padding: 14px 16px;
+  cursor: pointer;
+}
+
+.taskContainer--completed .taskName {
+  text-decoration: line-through;
+  opacity: 0.6;
 }
  
 .taskName {
