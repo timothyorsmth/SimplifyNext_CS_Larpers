@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getCareRecipientInfo } from '../../Context/CareRecipientContext';
+import { useCareRecipientInfo } from '../../Context/CareRecipientContext';
 import { FaPlus } from 'react-icons/fa';
 import './Schedule.css';
 
@@ -127,7 +127,7 @@ function splitDateTime(iso: string) {
 }
 
 export default function Schedule() {
-    const { appointments, loading } = getCareRecipientInfo();
+    const { appointments, loading } = useCareRecipientInfo();
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [strip, setStrip] = useState(0);
     const [showPopup, setShowPopup] = useState(false);

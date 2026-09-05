@@ -14,7 +14,8 @@ function formatDate(dateStr: string | null): string {
     });
 }
 
-function formatDateTime(dateStr: string): string {
+function formatDateTime(dateStr: string | null): string {
+    if (!dateStr) return "—";
     return new Date(dateStr).toLocaleString('en-SG', {
         day: '2-digit', month: 'short', year: 'numeric',
         hour: '2-digit', minute: '2-digit'

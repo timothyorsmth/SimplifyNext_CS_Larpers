@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import type { IconType } from "react-icons";
 import { FiUser } from "react-icons/fi";
 import { FaPills, FaCar } from "react-icons/fa";
-import { getCareRecipientInfo } from "../../Context/CareRecipientContext";
+import { useCareRecipientInfo } from "../../Context/CareRecipientContext";
 import { getCaregiverInfo } from '../../Context/CaregiverContext';
 
 // Import context
@@ -207,7 +207,7 @@ function CreateTaskPopup({
 }
 
 function Tasks() {
-  const { careRecipient } = getCareRecipientInfo(); 
+  const { careRecipient } = useCareRecipientInfo(); 
   const { caregivers } = getCaregiverInfo();
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isModalOpen, setModalOpen] = useState(false);
