@@ -1,12 +1,30 @@
 .PatientProfile {
     margin: 5vw;
     margin-top: 5vh;
+
+    /* Type scale */
+    --font-size-h1: 1.75rem;
+    --font-size-h3: 1.1rem;
+    --font-size-label: 0.75rem;
+    --font-size-body: 0.95rem;
+    --font-size-badge: 0.7rem;
+
+    font-size: var(--font-size-body)
+
 }
+
+
 
 .TitleBar {
     display:grid;
     grid-template-columns: 5fr 1fr;
     align-items: baseline;
+}
+
+.TitleBar h1 {
+    font-size:var(--font-size-h1);
+    font-weight: 700;
+    margin: 0;
 }
 
 .ExportInfo {
@@ -15,17 +33,44 @@
 }
 
 .heading {
+    font-size: var(--font-size-h3);
+    font-weight: 600;
     margin-bottom: 1vh;
 }
 
 .attribute {
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: var(--font-size-label);
     color: var(--color-green);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0 0 0.15rem;
 }
 
 .dataField {
-    font-size: 0.8rem;
+    font-size: var(--font-size-body);
+    margin: 0;
+}
+
+.conditionName{
+    font-weight: 700;
+}
+
+.notes {
+    font-size: var(--font-size-label);
+    color: #555;
+    font-style: italic;
+    margin:0.25rem 0 0;
+
+}
+
+.statusBadge{
+    font-size:var(--font-size-badge);
+    font-weight: 600;
+    text-transform: capitalize;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: #eee;
 }
 
 .InfoBox {
@@ -33,4 +78,18 @@
     flex-direction: row;
     flex-wrap: wrap;
     gap: 20px;
+}
+
+.HistoryHeader{
+    display: flex;
+    align-items: center;
+    gap: 8px
+}
+
+.HistoryEntry,
+.MedicationEntry,
+.AppointmentEntry {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
 }
