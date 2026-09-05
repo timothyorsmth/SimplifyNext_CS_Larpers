@@ -2,15 +2,51 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { fetchCareRecipientData } from '../API/CareCircleData'
 
 // Things to import from JSON data
-type CareRecipientData = {
+type MedicalHistoryEntry = {
+    id: string;
+    condition: string;
+    diagnosedDate: string;
+    status: string;
+    notes: string | null;
+};
+
+type Medication = {
+    id: string;
+    name: string;
+    dosage: string;
+    frequency: string;
+    startDate: string;
+    endDate: string | null;
+    status: string;
+    prescribedFor: string | null;
+};
+
+type Appointment = {
+    id: string;
+    type: string;
+    date: string;
+    provider: string;
+    status: string;
+    notes: string | null;
+};
+
+export type CareRecipientData = {
     recipientInfo: {
         id: string;
         profile: {
-            first_name: string
-            last_name: string
-        }
-    }
-}
+            first_name: string;
+            last_name: string;
+        };
+        dateOfBirth: string;
+        sex: string;
+        bloodType: string;
+        allergies: string[];
+        primaryPhysician: string;
+    };
+    medicalHistory: MedicalHistoryEntry[];
+    medications: Medication[];
+    appointments: Appointment[];
+};
 
 // Values that the other files reference
 type CareRecipientContextValue = {
@@ -19,7 +55,6 @@ type CareRecipientContextValue = {
     careRecipientFirstName: string | null;
     careRecipientLastName: string | null;
     loading: boolean;
-
 }
 
 // thank you claude
@@ -38,9 +73,9 @@ export function CareRecipientProvider({ children }: { children: React.ReactNode 
 
     const value: CareRecipientContextValue = {
         careRecipient,
-        recipientId: careRecipient?.recipientInfo.id ?? '',
-        careRecipientFirstName: careRecipient?.recipientInfo.profile.first_name ?? '',
-        careRecipientLastName: careRecipient?.recipientInfo.profile.last_name ?? '',
+        recipientId: careRecipient?.recipientInfo?.id ?? null,
+        careRecipientFirstName: careRecipient?.recipientInfo?.profile?.first_name ?? null,
+        careRecipientLastName: careRecipient?.recipientInfo?.profile?.last_name ?? null,
         loading,
     };
 
@@ -51,10 +86,10 @@ export function CareRecipientProvider({ children }: { children: React.ReactNode 
     );
 }
 
-export function getCareRecipientInfo() {
+export function useCareRecipientInfo() {
     const context = useContext(CareRecipientContext);
     if (!context) {
-        throw new Error('getCareRecipientInfo must be used within a CareRecipientProvider');
+        throw new Error('useCareRecipientInfo must be used within a CareRecipientProvider');
     }
     return context;
 }
