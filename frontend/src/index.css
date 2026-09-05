@@ -1,18 +1,18 @@
 /* Design tokens (basically like constants that we reference) */
 :root {
-    --colour-light: #fff6ef;
-    --colour-dark: #11354e;
-    --colour-darkish: #636363;
-    --colour-grey: #e0dcd1;
-    --colour-yellow: #fbb316;
-    --colour-darkgreen: #739b4d;
-    --colour-green: #cdd692;
+  --colour-light: #fff6ef;
+  --colour-dark: #11354e;
+  --colour-darkish: #636363;
+  --colour-grey: #e0dcd1;
+  --colour-yellow: #fbb316;
+  --colour-darkgreen: #739b4d;
+  --colour-green: #cdd692;
 
-    /* For warnings and shit */
-    --colour-warning: #f4d68d;
-    --colour-error: #d24c19;
+  /* For warnings and shit */
+  --colour-warning: #f4d68d;
+  --colour-error: #d24c19;
 
-    /* Spacing scale */
+  /* Spacing scale */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
@@ -43,11 +43,7 @@ body {
   -webkit-font-smoothing: antialiased;
   color: var(--colour-dark);
   background: var(--colour-light);
-
-  
 }
-
-
 
 /* Make buttons look prettier */
 button, input, textarea, select {

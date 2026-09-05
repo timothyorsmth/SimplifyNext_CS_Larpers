@@ -66,8 +66,9 @@
     {
       "id": "appt1",
       "type": "Physical Therapy",
-      "date": "2026-01-11T14:40:00",
-      "provider": "Tan Tock Seng Hospital",
+      "date": "2026-09-06T14:40:00",
+      "provider": "Dr. Andrew Garfield",
+      "location": "Tan Tock Seng Hospital East Wing 04-14",
       "status": "upcoming",
       "notes": null
     },
@@ -75,7 +76,8 @@
       "id": "appt2",
       "type": "Diabetes Checkup",
       "date": "2025-11-03T09:00:00",
-      "provider": "Dr. Wei Lim",
+      "provider": "Dr. Jackie Lim",
+      "location": "Ng Teng Fong Hospital Orthopedic Ward 12-03",
       "status": "completed",
       "notes": "HbA1c 7.1%, advised to reduce sugar intake"
     }

@@ -10,6 +10,15 @@ type CareRecipientData = {
             last_name: string
         }
     }
+    appointments: {
+        id: string,
+        type: string,
+        date: string | null,
+        provider: string,
+        location: string,
+        status: string,
+        notes: string | null
+    }[]
 }
 
 // Values that the other files reference
@@ -18,8 +27,8 @@ type CareRecipientContextValue = {
     careRecipient: CareRecipientData | null; // for dev purposes, remove for better data abstraction
     careRecipientFirstName: string | null;
     careRecipientLastName: string | null;
+    appointments: CareRecipientData['appointments']; // convenience field, mirrors careRecipient.appointments
     loading: boolean;
-
 }
 
 // thank you claude
@@ -41,6 +50,7 @@ export function CareRecipientProvider({ children }: { children: React.ReactNode 
         recipientId: careRecipient?.recipientInfo.id ?? '',
         careRecipientFirstName: careRecipient?.recipientInfo.profile.first_name ?? '',
         careRecipientLastName: careRecipient?.recipientInfo.profile.last_name ?? '',
+        appointments: careRecipient?.appointments ?? [], // default to [] so consumers can .map/.filter without a null check
         loading,
     };
 
