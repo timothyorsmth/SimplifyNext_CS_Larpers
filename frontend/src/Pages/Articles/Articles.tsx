@@ -1,10 +1,9 @@
 import './Articles.css';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { useCareRecipientInfo } from '../../Context/CareRecipientContext';
-import { searchRelevantSchemesForConditions } from './articleSearch';
-import type { SchemeResult } from './articleSearch';
+import { useArticlesInfo } from '../../Context/ArticlesContext';
 
 interface ArticleListProps {
   /** Conditions already stored for the patient. The component has no search input. */
@@ -21,56 +20,29 @@ function getHistoryConditions(medicalHistory: ArticleListProps['medicalHistory']
 
 function ArticleList({ medicalHistory }: ArticleListProps) {
   const { careRecipient, loading: recipientLoading } = useCareRecipientInfo();
+  const { getCached, isLoading, ensureSearched } = useArticlesInfo();
+
   const contextMedicalHistory = careRecipient?.medicalHistory.map(entry => entry.condition);
   const effectiveMedicalHistory = medicalHistory ?? contextMedicalHistory;
   const conditions = useMemo(() => getHistoryConditions(effectiveMedicalHistory), [effectiveMedicalHistory]);
-  // Stable cache key for "have we already searched for this exact set of
-  // conditions" — used instead of comparing arrays by reference.
   const conditionsKey = conditions.join('|');
 
-  const [searchState, setSearchState] = useState<{
-    key: string;
-    articles: SchemeResult[];
-    error: string;
-  }>({ key: '', articles: [], error: '' });
-
-  const loading = recipientLoading || (conditions.length > 0 && searchState.key !== conditionsKey);
-  const error = searchState.key === conditionsKey ? searchState.error : '';
-
   useEffect(() => {
-    let cancelled = false;
-
-    if (conditions.length === 0) {
-      return () => {
-        cancelled = true;
-      };
+    if (conditionsKey) {
+      ensureSearched(conditionsKey, conditions);
     }
-
-    searchRelevantSchemesForConditions(conditions)
-      .then(results => {
-        if (!cancelled) setSearchState({ key: conditionsKey, articles: results, error: '' });
-      })
-      .catch(searchError => {
-        if (cancelled) return;
-        setSearchState({
-          key: conditionsKey,
-          articles: [],
-          error: searchError instanceof Error ? searchError.message : 'Unable to load articles right now.',
-        });
-      });
-
-    return () => {
-      cancelled = true;
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conditionsKey]);
 
+  const cached = getCached(conditionsKey);
+  const loading = recipientLoading || (Boolean(conditionsKey) && !cached && isLoading(conditionsKey));
+  const error = cached?.error ?? '';
+
   const visibleArticles = useMemo(() => {
-    if (conditions.length === 0) return [];
-    const articles = searchState.key === conditionsKey ? searchState.articles : [];
-    const recommended = articles.filter(article => article.recommended);
-    return (recommended.length > 0 ? recommended : articles).slice(0, 2);
-  }, [conditions, conditionsKey, searchState]);
+    if (!conditionsKey || !cached) return [];
+    const recommended = cached.articles.filter(article => article.recommended);
+    return (recommended.length > 0 ? recommended : cached.articles).slice(0, 2);
+  }, [conditionsKey, cached]);
 
   return (
     <section className="ArticleList" aria-labelledby="articles-heading" aria-busy={loading}>

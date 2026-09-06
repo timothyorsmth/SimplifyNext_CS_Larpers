@@ -3,6 +3,7 @@ from html.parser import HTMLParser
 from urllib.parse import parse_qs, quote_plus, unquote, urlparse
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -157,6 +158,19 @@ def _decode_search_url(raw_url: str) -> str:
     return url
 
 
+def _fetch_search_page(search_query: str) -> str | None:
+    request = Request(
+        f"https://html.duckduckgo.com/html/?q={quote_plus(search_query)}",
+        headers={"User-Agent": "Mozilla/5.0 SimplifyNext/1.0"},
+    )
+    try:
+        with urlopen(request, timeout=6) as response:
+            return response.read().decode("utf-8", errors="ignore")
+    except Exception as e:
+        print(f"Article search source skipped: {e}")
+        return None
+
+
 def _search_web_articles(query: str, max_results: int = 12) -> list[dict[str, str]]:
     """Search useful public-health sources without exposing search keys to React."""
     search_terms = " ".join(query.split())
@@ -168,48 +182,42 @@ def _search_web_articles(query: str, max_results: int = 12) -> list[dict[str, st
     seen_urls: set[str] = set()
     articles: list[dict[str, str]] = []
 
-    for search_query in search_queries:
-        request = Request(
-            f"https://html.duckduckgo.com/html/?q={quote_plus(search_query)}",
-            headers={"User-Agent": "Mozilla/5.0 SimplifyNext/1.0"},
-        )
-
-        try:
-            with urlopen(request, timeout=6) as response:
-                html = response.read().decode("utf-8", errors="ignore")
-        except Exception as e:
-            print(f"Article search source skipped: {e}")
-            continue
-
-        parser = _DuckDuckGoResultParser()
-        parser.feed(html)
-        parser.close()
-
-        for result in parser.results:
-            url = _decode_search_url(result["url"])
-            parsed_url = urlparse(url)
-            hostname = (parsed_url.hostname or "").lower().removeprefix("www.")
-
-            if parsed_url.scheme not in {"http", "https"} or not hostname:
-                continue
-            if hostname.endswith("duckduckgo.com") or url in seen_urls:
+    # Run all 3 DuckDuckGo queries in parallel instead of one after another —
+    # previously a slow/blocked query delayed every query queued behind it,
+    # producing several stacked timeout messages in a row.
+    with ThreadPoolExecutor(max_workers=len(search_queries)) as executor:
+        futures = [executor.submit(_fetch_search_page, q) for q in search_queries]
+        for future in as_completed(futures):
+            html = future.result()
+            if html is None:
                 continue
 
-            seen_urls.add(url)
-            articles.append(
-                {
-                    "title": " ".join(unescape(result["title"]).split()),
-                    "url": url,
-                    "summary": " ".join(unescape(result["summary"]).split()),
-                    "source": hostname,
-                }
-            )
+            parser = _DuckDuckGoResultParser()
+            parser.feed(html)
+            parser.close()
 
-            if len(articles) >= max_results:
-                return articles
+            for result in parser.results:
+                url = _decode_search_url(result["url"])
+                parsed_url = urlparse(url)
+                hostname = (parsed_url.hostname or "").lower().removeprefix("www.")
+
+                if parsed_url.scheme not in {"http", "https"} or not hostname:
+                    continue
+                if hostname.endswith("duckduckgo.com") or url in seen_urls:
+                    continue
+
+                seen_urls.add(url)
+                articles.append(
+                    {
+                        "title": " ".join(unescape(result["title"]).split()),
+                        "url": url,
+                        "summary": " ".join(unescape(result["summary"]).split()),
+                        "source": hostname,
+                    }
+                )
 
     if len(articles) >= 4:
-        return articles
+        return articles[:max_results]
 
     # DuckDuckGo occasionally returns an anti-bot page to local development
     # servers. Bing's RSS response is a lightweight fallback that does not
@@ -246,7 +254,7 @@ def _search_web_articles(query: str, max_results: int = 12) -> list[dict[str, st
     except Exception as e:
         print(f"Fallback article search source skipped: {e}")
 
-    return articles
+    return articles[:max_results]
 
 
 @app.get("/api/schemes/search")
