@@ -22,7 +22,7 @@ function Dashboard(){
             <div className="WelcomeHeader">
                 <div>
                     <p>Good morning,</p>
-                    <h1>{loading ? '' : `${activeCaregiver?.profile.first_name ?? 'User'}.`}</h1>
+                    <h1 className='CaregiverName'>{loading ? '' : `${activeCaregiver?.profile.first_name ?? 'User'}.`}</h1>
                 </div>
                 <div className="ProfilePicContainer">
                     <div className="UserProfilePic" style={profilePictureStyle}></div>

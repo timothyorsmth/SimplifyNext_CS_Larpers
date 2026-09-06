@@ -10,10 +10,13 @@
     display: none;
 }
 
-
 .WelcomeHeader {
     display: grid;
     grid-template-columns: 3fr 1fr;
+}
+
+.CaregiverName {
+    color: var(--colour-darkgreen);
 }
 
 .UserProfilePic {
