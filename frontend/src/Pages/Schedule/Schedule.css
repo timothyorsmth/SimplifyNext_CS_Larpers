@@ -63,7 +63,7 @@
 }
 
 .hourLabel {
-  width: 24px;
+  width: 40px;
   font-size: 14px;
   color: var(--colour-dark);
   padding-top: 4px;
@@ -177,4 +177,252 @@
   padding: 10px 20px;
   cursor: pointer;
   margin-top: 8px;
+}
+
+.viewToggleRow {
+  display: flex;
+  gap: 8px;
+  padding: 12px 12px 0;
+}
+
+.viewToggleBtn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  background: #e2e2e2;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.viewToggleBtnActive {
+  background: var(--colour-darkgreen);
+  color: var(--colour-light);
+}
+
+/* --- Week view --- */
+
+.weekView {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.weekDayCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ececec;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.weekDayHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 40px;
+}
+
+.weekDayMonth {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.weekDayNum {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.weekDayNumToday {
+  color: var(--colour-darkgreen);
+}
+
+.weekDayEvents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+
+.weekDayEmpty {
+  font-size: 13px;
+  color: #999;
+}
+
+.weekDayEventChip {
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.weekDayMore {
+  font-size: 12px;
+  color: #666;
+  align-self: center;
+}
+
+/* --- Month view --- */
+
+.monthView {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.monthLabel {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.monthWeekdayLabel {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  padding-bottom: 4px;
+}
+
+.monthDayCell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font-size: 14px;
+  cursor: pointer;
+  gap: 2px;
+}
+
+.monthDayCellToday {
+  background: var(--colour-darkgreen);
+  color: var(--colour-light);
+}
+
+.monthDayCellMuted {
+  opacity: 0.35;
+}
+
+.monthDayDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--colour-yellow);
+}
+
+.rangeNavRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px 10px;
+}
+
+.rangeNavBtn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--colour-dark);
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+.rangeNavLabel {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* Week view chips — replace the old single-line .weekDayEventChip rule */
+.weekDayEventChip {
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.weekDayEventName {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.weekDayEventMeta {
+  font-size: 11px;
+  color: #777;
+}
+
+/* Month view — peek panel */
+.monthDayCellPeeked {
+  outline: 2px solid var(--colour-darkgreen);
+}
+
+.monthPeekPanel {
+  margin-top: 12px;
+  background: #ececec;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.monthPeekHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.monthPeekDate {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.monthPeekViewDayBtn {
+  background: var(--colour-darkgreen);
+  color: var(--colour-light);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.monthPeekEmpty {
+  font-size: 13px;
+  color: #888;
+}
+
+.monthPeekEvent {
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.monthPeekEventName {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.monthPeekEventMeta {
+  font-size: 12px;
+  color: #777;
 }
