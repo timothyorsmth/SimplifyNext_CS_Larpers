@@ -7,6 +7,8 @@ import type { IconType } from "react-icons";
 import { FiUser, FiZap } from "react-icons/fi";
 import { FaPills, FaCar, FaHospitalAlt } from "react-icons/fa";
 import { useCareRecipientInfo } from "../../Context/CareRecipientContext";
+import { getCaregiverInfo } from '../../Context/CaregiverContext';
+import { useTaskInfo, type Task } from '../../Context/TaskContext';
 import { API_BASE } from "../../App";
 
 // Import context
@@ -102,6 +104,14 @@ function CreateTaskPopup({
   );
   const [finishBefore, setFinishBefore] = useState("12:00");
 
+  // Keep the selected assignee valid as the real caregiver list arrives
+  // (assignablePeople starts empty while CaregiverContext is still loading)
+  useEffect(() => {
+    if (!assignablePeople.includes(assignedTo)) {
+      setAssignedTo(assignablePeople[0] ?? "");
+    }
+  }, [assignablePeople]);
+
   if (!isOpen) return null;
 
   const handleCreate = () => {
@@ -113,7 +123,6 @@ function CreateTaskPopup({
       finishBefore,
       repeat,
       assignedTo,
-      overdue: false,
     });
     setName("");
     setIcon(ICON_OPTIONS[0].value);
@@ -482,6 +491,16 @@ function Tasks() {
     ]);
     // TODO: POST to backend / write to mock JSON via api/ layer
   };
+  const { caregivers } = getCaregiverInfo();
+  const { effectiveTasks, createTask, toggleTaskCompleted } = useTaskInfo();
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const incompleteTasks = effectiveTasks.find((t) => t.overdue);
+  const otherTasks = effectiveTasks.filter((t) => t !== incompleteTasks);
+
+  const assignablePeople = caregivers
+    .filter((c) => c.recipientId === careRecipient?.recipientInfo.id) // only people caring for this recipient
+    .map((c) => `${c.profile.first_name} ${c.profile.last_name}`);
 
   return (
     <div className="tasksPage">
@@ -536,11 +555,18 @@ function Tasks() {
           <FiZap /> Create with AI
         </button>
       </div>
+      <button
+        className="taskCreateButton"
+        type="button"
+        onClick={() => setModalOpen(true)}
+      >
+        Create Task
+      </button>
 
       <CreateTaskPopup
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        onCreate={handleCreateTask}
+        onCreate={createTask}
         assignablePeople={assignablePeople}
       />
 

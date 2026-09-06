@@ -1,12 +1,13 @@
 .PatientProfile {
     margin: 5vw;
     margin-top: 5vh;
+    padding-bottom: calc(1vh + var(--navBarHeight));
 
     /* Type scale */
     --font-size-h1: 1.75rem;
     --font-size-h3: 1.1rem;
     --font-size-label: 0.75rem;
-    --font-size-body: 0.95rem;
+    --font-size-body: 0.85rem;
     --font-size-badge: 0.7rem;
 
     font-size: var(--font-size-body)
@@ -44,7 +45,7 @@
     color: var(--color-green);
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    margin: 0 0 0.15rem;
+    margin: 0 0 0.25rem;
 }
 
 .dataField {
@@ -60,7 +61,7 @@
     font-size: var(--font-size-label);
     color: #555;
     font-style: italic;
-    margin:0.25rem 0 0;
+    margin:0.25rem 0 0.15rem 0;
 
 }
 
@@ -78,6 +79,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     gap: 20px;
+    margin-bottom: 2vh;
 }
 
 .HistoryHeader{
