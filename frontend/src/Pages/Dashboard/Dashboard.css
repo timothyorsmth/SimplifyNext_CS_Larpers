@@ -1,9 +1,8 @@
 .Dashboard {
-    margin: 5vw;
-    margin-top: 5vh;
-
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+  margin: 5vw;
+  margin-top: 5vh;
+  min-height: 100%;
+  padding-bottom: 12vh;
 }
 
 .Dashboard::-webkit-scrollbar {
