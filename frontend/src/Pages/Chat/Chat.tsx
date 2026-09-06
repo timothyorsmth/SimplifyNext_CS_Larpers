@@ -9,6 +9,8 @@ import { FaTrashCan } from "react-icons/fa6";
 
 import { API_BASE } from '../../App'
 import { useChat } from "../../Context/ChatContext";
+import { useCareRecipientInfo } from "../../Context/CareRecipientContext";
+import type { Appointment } from "../../Context/CareRecipientContext";
 
 
 interface SuggestedActions {
@@ -22,10 +24,20 @@ const SUGGESTEDACTIONS: SuggestedActions[] = [
   { id: 'new-daily-actions', label: 'New Daily Actions' },
 ];
 
+// Matches agents.chatBot.AgentMessage on the backend.
+interface AgentMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 interface ChatActionResponse {
   id: string;
   label: string;
   type: string;
+  // Present when the action carries structured data the frontend needs to
+  // actually perform on approval (e.g. the appointment fields for
+  // "create_schedule_item") rather than just re-deriving it from the label.
+  payload?: Record<string, unknown> | null;
 }
 
 interface ChatApiResponse {
@@ -35,11 +47,18 @@ interface ChatApiResponse {
 
 
 // Function call to send a message to chat bot :)
-export async function chatResponse(promptStr: string) {
+// Sends the WHOLE conversation so far, not just the latest message — the
+// backend agent flattens this into one turn (see _buildChatTranscript in
+// chatBot.py) so it can ask a clarifying question and understand the next
+// reply in context.
+export async function chatResponse(messages: AgentMessage[]) {
   const response = await fetch(`${API_BASE}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ promptStr }),
+    body: JSON.stringify({
+      messages,
+      today: new Date().toISOString().split("T")[0],
+    }),
   });
 
   if (!response.ok) {
@@ -51,8 +70,8 @@ export async function chatResponse(promptStr: string) {
 
 // wrapper function :|
 // formats the raw backend response into the shape the UI wants
-export async function sendChatMessage(promptStr: string): Promise<ChatApiResponse> {
-  const raw = await chatResponse(promptStr);
+export async function sendChatMessage(messages: AgentMessage[]): Promise<ChatApiResponse> {
+  const raw = await chatResponse(messages);
 
   return {
     text: raw.text ?? raw.message ?? '',
@@ -63,6 +82,7 @@ export async function sendChatMessage(promptStr: string): Promise<ChatApiRespons
 function Chat() {
   // states for chat messages
   const { messages, setMessages, clearMessages } = useChat();
+  const { addAppointment } = useCareRecipientInfo();
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -79,17 +99,30 @@ function Chat() {
     const thinkingId = crypto.randomUUID();
     const thinkingMessage: ChatMessage = { id: thinkingId, role: 'ai', text: '…', isThinking: true };
 
+    // Build the history to send BEFORE adding the thinking placeholder —
+    // that placeholder text ("…") is UI-only and should never be sent to
+    // the backend as if it were a real assistant turn.
+    const history: AgentMessage[] = [
+      ...messages
+        .filter((m) => !m.isThinking)
+        .map((m): AgentMessage => ({
+          role: m.role === 'user' ? 'user' : 'assistant',
+          content: m.text,
+        })),
+      { role: 'user', content: trimmed },
+    ];
+
     setMessages((prev) => [...prev, userMessage, thinkingMessage]);
     setInput('');
     setIsSending(true);
 
     try {
-      const aiResponse: ChatApiResponse = await sendChatMessage(trimmed);
+      const aiResponse: ChatApiResponse = await sendChatMessage(history);
 
       const actions: ChatAction[] | undefined = aiResponse.actions?.map((action) => ({
         id: action.id,
         label: action.label,
-        onSelect: () => handleApprove(action.id, action.label, action.type),
+        onSelect: () => handleApprove(action.id, action.label, action.type, action.payload),
       }));
 
       setMessages((prev) =>
@@ -114,10 +147,26 @@ function Chat() {
     }
   }
 
-  function handleApprove(actionId: string, label: string, type: string) {
-    // TODO: wire to real task/schedule creation once backend endpoint exists
-    // TODO: change the finish task message :|
-    console.log('Approved:', { actionId, type });
+  function handleApprove(
+    actionId: string,
+    label: string,
+    type: string,
+    payload?: Record<string, unknown> | null
+  ) {
+    if (type === 'create_schedule_item' && payload) {
+      // Same shared store Schedule.tsx's "+" popup writes into — the
+      // appointment shows up on the Schedule page without any extra wiring.
+      addAppointment(payload as Omit<Appointment, 'id'>);
+      setMessages((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), role: 'ai', text: `Done — "${label}" has been added to the schedule.` },
+      ]);
+      return;
+    }
+
+    // TODO: wire up create_task / generate_report / confirm_generic once
+    // those flows exist. For now they just confirm without doing anything.
+    console.log('Approved (not yet wired):', { actionId, type, payload });
     setMessages((prev) => [
       ...prev,
       { id: crypto.randomUUID(), role: 'ai', text: `Done — "${label}" has been added.` },

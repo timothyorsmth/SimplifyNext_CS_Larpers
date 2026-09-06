@@ -1,12 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Literal
 
 from agents.chatBot import (
+    AgentMessage,
     ChatResponse,
-    chatPrompt,
-    getChatBotSystemPrompt,
+    runChatAgent,
     runTaskAgent,
     TaskAgentResponse,
 )  # wraps the Bedrock call
@@ -24,6 +23,8 @@ origins = [
     "http://127.0.0.1:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
 ]
 
 # Configure CORS for Vite frontend development server
@@ -36,25 +37,26 @@ app.add_middleware(
 )
 
 
-# For chat bot :)
+# For chat bot :) -- now takes the full conversation (not just the latest
+# message) so the agent can hold a real back-and-forth, e.g. asking "what
+# time?" and understanding the caregiver's next reply in context.
 class ChatRequest(BaseModel):
-    promptStr: str
+    messages: list[AgentMessage]
+    today: str
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(payload: ChatRequest):
     try:
-        result = chatPrompt(payload.promptStr, getChatBotSystemPrompt())  # change to prompt question in here
-        return {"text": result, "actions": None}
+        return runChatAgent(
+            [m.model_dump() for m in payload.messages],
+            payload.today,
+        )
     except Exception as e:
         print(f"ERROR: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 # For "Create with AI" on the Tasks page — structured, possibly multi-turn.
-class AgentMessage(BaseModel):
-    role: Literal["user", "assistant"]
-    content: str
-
 class TaskAgentRequest(BaseModel):
     messages: list[AgentMessage]
     assignablePeople: list[str] = []

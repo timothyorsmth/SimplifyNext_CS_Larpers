@@ -3,16 +3,20 @@ Chat bot backend for the care-coordination app.
 
 This module wraps a Claude model (via AWS Bedrock) so the frontend can turn
 plain-English messages from a caregiver into either:
-  - a plain conversational reply (the general chat widget, via `chatPrompt`
-    + `getChatBotSystemPrompt`), or
+  - a conversational reply that can optionally propose a structured action
+    button (e.g. scheduling an appointment) — the general chat widget, via
+    `runChatAgent` + `getChatBotSystemPrompt`, or
   - a structured task (the "Create with AI" flow on the Tasks page, via
     `runTaskAgent` + `getTaskAgentSystemPrompt`).
 
 Both paths share the same low-level Bedrock call (`chatPrompt`), just with
-different system prompts loaded from prompts/*.txt. The task-agent path
-additionally asks Claude to reply in strict JSON and parses/validates that
-JSON into `TaskAgentClarify` / `TaskAgentDone` before returning it, so the
-frontend never has to deal with raw model text.
+different system prompts loaded from prompts/*.txt, and both flatten the
+whole conversation-so-far into one big user turn (see the comment above
+`_buildTaskAgentTranscript` for why). The task-agent path asks for strict
+JSON the whole way through; the general chat path asks for plain text, plus
+an optional trailing `ACTION_JSON:` line when — and only when — the
+caregiver is asking to schedule something, which `_extractChatAction` peels
+off before the text reaches the frontend.
 
 `main()` is a quick manual smoke test — type a question in the terminal and
 see what Claude says, without going through the frontend or a server.
@@ -22,9 +26,14 @@ import agents.ai_common as ai_common
 
 # import libraries
 import json
+import uuid
 from pathlib import Path
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from typing import Optional, Literal, Union
+
+class AgentMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
 
 # formats — general chat widget
 class ChatAction(BaseModel):
@@ -177,6 +186,96 @@ def runTaskAgent(
     if status == "done":
         return TaskAgentDone(**data).model_dump()
     raise ValueError(f"Task agent returned unknown status: {data!r}")
+
+# --- General chat agent (conversation + optional scheduling action) ---
+#
+# chatAgent.txt defines the assistant's normal persona/behaviour. We don't
+# touch that file here -- instead we layer on a second, separate set of
+# instructions (below) purely about *when and how* to propose a structured
+# action, and append it to the base prompt. This keeps the two concerns
+# separate: chatAgent.txt owns "how the assistant should talk", this file
+# owns "how the assistant hands data back to the UI".
+
+CHAT_ACTION_INSTRUCTIONS = (
+    "\nAdditionally, if -- and only if -- the caregiver is asking you to "
+    "schedule, book, or add a medical appointment (not a daily task like a "
+    "medication reminder; that's a separate feature), do both of the "
+    "following:\n\n"
+    "1. Reply normally, in one or two sentences, confirming what you "
+    "understood.\n"
+    "2. On its own new line, at the very end of your reply, output exactly "
+    "this (no markdown fences, no extra text after it):\n"
+    'ACTION_JSON: {"label": "<short button label, e.g. \'Add appointment\'>", '
+    '"type": "create_schedule_item", "payload": {"type": "<appointment '
+    'title>", "date": "<YYYY-MM-DDTHH:MM:00>", "provider": "<provider name, '
+    'or empty string if not given>", "location": "<location, or empty '
+    'string if not given>", "notes": null}}\n\n'
+    "If you don't yet have enough information to fill that in (most "
+    "importantly: a date and time), ask a short clarifying question in "
+    "plain text instead, and do NOT output an ACTION_JSON line that turn.\n\n"
+    "For anything that isn't an appointment-scheduling request, just reply "
+    "normally and never output an ACTION_JSON line.\n"
+)
+
+def getChatSystemPromptWithActions() -> str:
+    return getChatBotSystemPrompt() + "\n\n" + CHAT_ACTION_INSTRUCTIONS
+
+def _buildChatTranscript(messages: list[dict], today: str) -> str:
+    lines = [f"TODAY'S DATE: {today}", "", "CONVERSATION SO FAR:"]
+    for m in messages:
+        speaker = "Caregiver" if m["role"] == "user" else "Assistant"
+        lines.append(f"{speaker}: {m['content']}")
+    return "\n".join(lines)
+
+def _extractChatAction(raw: str):
+    """
+    Pulls a trailing "ACTION_JSON: {...}" line out of Claude's reply, if
+    present. Returns (display_text, action_dict_or_None). Never raises --
+    a malformed action line is dropped rather than breaking the whole
+    chat turn, since worst case the caregiver just doesn't get a button.
+    """
+    marker = "ACTION_JSON:"
+    kept_lines = []
+    action = None
+
+    for line in raw.splitlines():
+        stripped = line.strip()
+        if stripped.startswith(marker):
+            json_part = stripped[len(marker):].strip()
+            try:
+                data = json.loads(json_part)
+                action = {
+                    "id": str(uuid.uuid4()),
+                    "label": data.get("label", "Confirm"),
+                    "type": data.get("type", "confirm_generic"),
+                    "payload": data.get("payload"),
+                }
+            except json.JSONDecodeError:
+                action = None
+            continue  # never show the raw marker line to the user
+        kept_lines.append(line)
+
+    return "\n".join(kept_lines).strip(), action
+
+def runChatAgent(messages: list[dict], today: str) -> dict:
+    """
+    Runs one turn of the general chat agent and returns a plain dict
+    shaped like ChatResponse (text + optional single-item actions list).
+    """
+    transcript = _buildChatTranscript(messages, today)
+    raw = chatPrompt(transcript, getChatSystemPromptWithActions())
+    text, action_data = _extractChatAction(raw)
+
+    actions = None
+    if action_data is not None:
+        try:
+            actions = [ChatAction(**action_data)]
+        except ValidationError:
+            # e.g. Claude used a `type` outside the allowed Literal values --
+            # keep the text reply, just drop the unusable action.
+            actions = None
+
+    return ChatResponse(text=text, actions=actions).model_dump()
 
 def main() -> None:
     userInput = input("Please ask a question: ")

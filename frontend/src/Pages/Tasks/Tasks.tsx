@@ -4,16 +4,10 @@ import './Tasks.css';
 // Import dependencies
 import { useState, useEffect } from "react";
 import type { IconType } from "react-icons";
-<<<<<<< Updated upstream
-import { FiUser } from "react-icons/fi";
-import { FaPills, FaCar } from "react-icons/fa";
-import { useCareRecipientInfo } from "../../Context/CareRecipientContext";
-import { getCaregiverInfo } from '../../Context/CaregiverContext';
-=======
 import { FiUser, FiZap } from "react-icons/fi";
 import { FaPills, FaCar, FaHospitalAlt } from "react-icons/fa";
 import { useCareRecipientInfo } from "../../Context/CareRecipientContext";
->>>>>>> Stashed changes
+import { API_BASE } from "../../App";
 
 // Import context
 
@@ -41,7 +35,7 @@ const INITIAL_TASKS: Task[] = [
     id: "t1",
     name: "Morning Meds",
     icon: "pill",
-    finishDate: "2024-09-04",
+    finishDate: "2026-09-04",
     finishBefore: "09:00",
     repeat: "daily",
     assignedTo: "Elenor Siew",
@@ -52,7 +46,7 @@ const INITIAL_TASKS: Task[] = [
     id: "t2",
     name: "Night Meds",
     icon: "pill",
-    finishDate: "2028-09-04",
+    finishDate: "2026-09-04",
     finishBefore: "21:00",
     repeat: "daily",
     assignedTo: "Elenor Siew",
@@ -62,13 +56,8 @@ const INITIAL_TASKS: Task[] = [
   {
     id: "t3",
     name: "Go to KKH",
-<<<<<<< Updated upstream
-    icon: "car",
-    finishDate: "2029-09-04",
-=======
     icon: "hospital",
     finishDate: "2026-09-04",
->>>>>>> Stashed changes
     finishBefore: "14:00",
     repeat: "never",
     assignedTo: "Tan Wei Jie",
@@ -113,17 +102,6 @@ function CreateTaskPopup({
   );
   const [finishBefore, setFinishBefore] = useState("12:00");
 
-<<<<<<< Updated upstream
-  // Keep the selected assignee valid as the real caregiver list arrives
-  // (assignablePeople starts empty while CaregiverContext is still loading)
-  useEffect(() => {
-    if (!assignablePeople.includes(assignedTo)) {
-      setAssignedTo(assignablePeople[0] ?? "");
-    }
-  }, [assignablePeople]);
- 
-=======
->>>>>>> Stashed changes
   if (!isOpen) return null;
 
   const handleCreate = () => {
@@ -262,15 +240,14 @@ type AgentResponse = AgentClarifyResponse | AgentDoneResponse;
 // The FastAPI backend runs on its own origin/port, separate from the Vite
 // dev server — that's why main.py has CORSMiddleware at all. A relative
 // fetch("/api/tasks/agent") from a page served by Vite would hit Vite
-// itself (404), not FastAPI. Set VITE_API_BASE_URL in your .env if the
-// backend isn't on the default 8000.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+// itself (404), not FastAPI. API_BASE (from App.tsx) is the one place
+// the backend's URL is configured — see that file to change it.
 
 async function callTaskAgent(
   messages: AgentMessage[],
   assignablePeople: string[]
 ): Promise<AgentResponse> {
-  const res = await fetch(`${API_BASE_URL}/api/tasks/agent`, {
+  const res = await fetch(`${API_BASE}/api/tasks/agent`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -451,12 +428,7 @@ function AiTaskCreator({
 }
 
 function Tasks() {
-<<<<<<< Updated upstream
-  const { careRecipient } = useCareRecipientInfo(); 
-  const { caregivers } = getCaregiverInfo();
-=======
   const { careRecipient } = useCareRecipientInfo();
->>>>>>> Stashed changes
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAiModalOpen, setAiModalOpen] = useState(false);
@@ -494,15 +466,6 @@ function Tasks() {
     return { ...t, overdue };
   });
 
-<<<<<<< Updated upstream
-  const incompleteTasks = effectiveTasks.find((t) => t.overdue);
-  const otherTasks = effectiveTasks.filter((t) => t !== incompleteTasks);
- 
-  const assignablePeople = caregivers
-    .filter((c) => c.recipientId === careRecipient?.recipientInfo.id) // only people caring for this recipient
-    .map((c) => `${c.profile.first_name} ${c.profile.last_name}`);
- 
-=======
   const highlightedTask = effectiveTasks.find((t) => t.overdue);
   const otherTasks = effectiveTasks.filter((t) => t !== highlightedTask);
 
@@ -512,7 +475,6 @@ function Tasks() {
     recipientFirstName && recipientLastName ? `${recipientFirstName} ${recipientLastName}` : null
   ].filter((v, i, arr): v is string => !!v && arr.indexOf(v) === i);
 
->>>>>>> Stashed changes
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed">) => {
     setTasks((prev) => [
       ...prev,
@@ -521,41 +483,14 @@ function Tasks() {
     // TODO: POST to backend / write to mock JSON via api/ layer
   };
 
-<<<<<<< Updated upstream
-  const toggleTaskCompleted = (id: string) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-    );
-    // TODO: persist to backend / mock JSON once that layer exists
-  };
- 
-  return (
-    <div className="tasksPage">
-      <h1 className="title">Today's Tasks</h1>
- 
-      {incompleteTasks && (() => {
-        const HighlightIcon = ICON_MAP[incompleteTasks.icon];
-=======
   return (
     <div className="tasksPage">
       <h1 className="title">Today's Tasks</h1>
 
       {highlightedTask && (() => {
         const HighlightIcon = ICON_MAP[highlightedTask.icon];
->>>>>>> Stashed changes
         return (
-          <div
-            className="incompleteTaskCard"
-            onClick={() => toggleTaskCompleted(incompleteTasks.id)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                toggleTaskCompleted(incompleteTasks.id);
-              }
-            }}
-          >
+          <div className="incompleteTaskCard">
             <span className="incompleteTaskLabel">Incomplete Tasks:</span>
             <div className="incompleteTaskContainer">
               <span className="taskIcon">
@@ -574,19 +509,7 @@ function Tasks() {
         {otherTasks.map((task) => {
           const RowIcon = ICON_MAP[task.icon];
           return (
-            <div
-              key={task.id}
-              className={`taskContainer${task.completed ? " taskContainer--completed" : ""}`}
-              onClick={() => toggleTaskCompleted(task.id)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  toggleTaskCompleted(task.id);
-                }
-              }}
-            >
+            <div key={task.id} className="taskContainer">
               <span className="taskIcon">{RowIcon && <RowIcon />}</span>
               <span className="taskName">{task.name}</span>
               <span className="taskPersonAvatar" title={task.assignedTo}>

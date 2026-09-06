@@ -1,17 +1,8 @@
 import { useState } from 'react';
 import { useCareRecipientInfo } from '../../Context/CareRecipientContext';
+import type { Appointment } from '../../Context/CareRecipientContext';
 import { FaPlus } from 'react-icons/fa';
 import './Schedule.css';
-
-export interface Appointment {
-  id: string;
-  type: string;                          // was "title"
-  date: string;                          // combined ISO datetime, e.g. "2026-01-11T14:40:00"
-  provider: string;
-  location: string;
-  status: 'upcoming' | 'completed';
-  notes: string | null;
-}
 
 interface Props {
   defaultDate: string;
@@ -127,7 +118,9 @@ function splitDateTime(iso: string) {
 }
 
 export default function Schedule() {
-    const { appointments, loading } = useCareRecipientInfo();
+    // `addAppointment` writes into the same shared store Chat.tsx's AI
+    // scheduling flow writes into — no more local-only appointments here.
+    const { appointments, loading, addAppointment } = useCareRecipientInfo();
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [strip, setStrip] = useState(0);
     const [showPopup, setShowPopup] = useState(false);
@@ -137,15 +130,9 @@ export default function Schedule() {
     const today = new Date();
     const todayISO = toISODate(today);
     const selectedISO = toISODate(selectedDate);
-    
-    const [localAppointments, setLocalAppointments] = useState<Appointment[]>([]);
 
     function handleCreateAppointment(appointment: Omit<Appointment, 'id'>) {
-        const newAppointment: Appointment = {
-            ...appointment,
-            id: crypto.randomUUID(), // temporary client-side id; swap for server-assigned id once a real endpoint exists
-        };
-        setLocalAppointments((prev) => [...prev, newAppointment]);
+        addAppointment(appointment);
         setShowPopup(false);
     }
 
@@ -158,9 +145,9 @@ export default function Schedule() {
     // loading is exposed by the context rather than an early return here —
     // never unmount children conditionally; gate the JSX below instead.
 
-    const dayAppointments: Appointment[] = loading
+    const dayAppointments: (Appointment & { date: string })[] = loading
     ? []
-    : [...appointments, ...localAppointments]
+    : appointments
         .filter((a): a is Appointment & { date: string } => a.date !== null)
         .filter((a) => splitDateTime(a.date).dateOnly === selectedISO)
         .sort((a, b) => a.date.localeCompare(b.date));

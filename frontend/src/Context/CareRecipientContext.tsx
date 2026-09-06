@@ -21,7 +21,9 @@ type Medication = {
     prescribedFor: string | null;
 };
 
-type Appointment = {
+// Exported so Schedule.tsx and Chat.tsx can both reference the same shape
+// instead of each declaring their own copy.
+export type Appointment = {
     id: string,
     type: string,
     date: string | null,
@@ -57,6 +59,12 @@ type CareRecipientContextValue = {
     careRecipientLastName: string | null;
     appointments: CareRecipientData['appointments']; // convenience field, mirrors careRecipient.appointments
     loading: boolean;
+    // Adds a new appointment to the shared store (assigns its id). This is
+    // the one write path into `appointments` — Schedule.tsx's manual "+"
+    // popup and Chat.tsx's AI-approved scheduling action both go through
+    // this, so neither one keeps its own separate local copy that the
+    // other can't see.
+    addAppointment: (appointment: Omit<Appointment, 'id'>) => void;
 }
 
 // thank you claude
@@ -73,6 +81,23 @@ export function CareRecipientProvider({ children }: { children: React.ReactNode 
         });
     }, []);
 
+    function addAppointment(appointment: Omit<Appointment, 'id'>) {
+        setCareRecipient((prev) => {
+            // No-op if the initial fetch hasn't resolved yet — there's
+            // nothing to append to. Callers should generally wait for
+            // `loading` to be false before allowing this to be triggered.
+            if (!prev) return prev;
+            const newAppointment: Appointment = {
+                ...appointment,
+                id: crypto.randomUUID(), // temporary client-side id; swap for server-assigned id once a real endpoint exists
+            };
+            return {
+                ...prev,
+                appointments: [...prev.appointments, newAppointment],
+            };
+        });
+    }
+
     const value: CareRecipientContextValue = {
         careRecipient,
         recipientId: careRecipient?.recipientInfo.id ?? '',
@@ -80,6 +105,7 @@ export function CareRecipientProvider({ children }: { children: React.ReactNode 
         careRecipientLastName: careRecipient?.recipientInfo.profile.last_name ?? '',
         appointments: careRecipient?.appointments ?? [], // default to [] so consumers can .map/.filter without a null check
         loading,
+        addAppointment,
     };
 
     return (
