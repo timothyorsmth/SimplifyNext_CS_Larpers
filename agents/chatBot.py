@@ -39,7 +39,7 @@ class AgentMessage(BaseModel):
 class ChatAction(BaseModel):
     id: str
     label: str
-    type: Literal["create_task", "create_schedule_item", "generate_report", "confirm_generic"]
+    type: Literal["create_task", "create_schedule_item", "generate_report", "confirm_generic", "update_patient_info"]
     # optional payload the frontend echoes back on approval, so you don't
     # have to re-derive "what was this button for" from the label text
     payload: Optional[dict] = None
@@ -100,6 +100,12 @@ def chatPrompt(userPrompt: str, systemPrompt: str = "", debug: bool = False):
 
         # 4. idk what this does im so fr.
         "temperature": 0,
+         # Stops generation the moment the model tries to hallucinate a new
+        # turn in the transcript format used by _buildChatTranscript /
+        # _buildTaskAgentTranscript. Without this, the model can keep
+        # inventing "Caregiver: ..." messages and replying to itself
+        # instead of stopping after its real answer.
+        "stop_sequences": ["\nCaregiver:", "\nAssistant:", "\nHuman:"],
     }
 
     body = json.dumps(body_dict)
@@ -234,8 +240,32 @@ CHAT_ACTION_INSTRUCTIONS = (
     "If you don't have enough information (most importantly: what the task "
     "is and what time it's due), ask a short clarifying question in plain "
     "text instead, and do NOT output an ACTION_JSON line that turn.\n\n"
-    "For anything that isn't an appointment or a task request, just reply "
-    "normally and never output an ACTION_JSON line.\n"
+    "\nSeparately, if -- and only if -- the caregiver explicitly states "
+    "new or corrected personal information about the care recipient "
+    "themselves (their name, sex, date of birth, blood type, allergies, or "
+    "primary physician -- NOT a new symptom, condition, or medication, "
+    "which are medical history and are out of scope for this action), do "
+    "both of the following:\n\n"
+    "1. Reply normally, in one sentence, confirming exactly what you "
+    "understood is changing.\n"
+    "2. On its own new line, at the very end of your reply, output exactly "
+    "this (no markdown fences, no extra text after it):\n"
+    'ACTION_JSON: {"label": "<a short, specific button label -- e.g. '
+    '\'Update blood type\' or \'Update allergies\'>", '
+    '"type": "update_patient_info", "payload": {<ONLY the field(s) actually '
+    'being changed, using these exact keys: "first_name", "last_name", '
+    '"dateOfBirth" (YYYY-MM-DD), "sex", "bloodType", "allergies" (a list of '
+    'strings), "primaryPhysician". Do NOT include any key the caregiver did '
+    'not explicitly ask to change.>}}\n\n'
+    "Be conservative here: only take this action when the caregiver is "
+    "unambiguously stating a correction or update to one of these exact "
+    "fields, never when they are just mentioning these details in passing "
+    "or describing something else (e.g. describing a reaction is not the "
+    "same as asking you to add an allergy). If in doubt, ask a clarifying "
+    "question in plain text instead of guessing, and do NOT output an "
+    "ACTION_JSON line that turn.\n\n"
+    "For anything that isn't an appointment, task, or personal-info update "
+    "request, just reply normally and never output an ACTION_JSON line.\n"
 )
 def getChatSystemPromptWithActions() -> str:
     return getChatBotSystemPrompt() + "\n\n" + CHAT_ACTION_INSTRUCTIONS
@@ -283,7 +313,7 @@ def runChatAgent(messages: list[dict], today: str) -> dict:
     shaped like ChatResponse (text + optional single-item actions list).
     """
     transcript = _buildChatTranscript(messages, today)
-    raw = chatPrompt(transcript, getChatSystemPromptWithActions())
+    raw = chatPrompt(transcript, getChatSystemPromptWithActions(), debug= True)
     text, action_data = _extractChatAction(raw)
 
     actions = None

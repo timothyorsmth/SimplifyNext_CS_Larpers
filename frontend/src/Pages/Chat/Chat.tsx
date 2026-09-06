@@ -10,7 +10,7 @@ import { FaTrashCan } from "react-icons/fa6";
 import { API_BASE } from '../../App'
 import { useChat } from "../../Context/ChatContext";
 import { useCareRecipientInfo } from "../../Context/CareRecipientContext";
-import type { Appointment } from "../../Context/CareRecipientContext";
+import type { Appointment, RecipientInfoUpdate } from "../../Context/CareRecipientContext";
 import { useTaskInfo } from "../../Context/TaskContext";
 import type { Task } from "../../Context/TaskContext";
 
@@ -38,8 +38,9 @@ interface ChatActionResponse {
   type: string;
   // Present when the action carries structured data the frontend needs to
   // actually perform on approval (e.g. the appointment fields for
-  // "create_schedule_item", or the task fields for "create_task") rather
-  // than just re-deriving it from the label.
+  // "create_schedule_item", the task fields for "create_task", or the
+  // patient-info fields for "update_patient_info") rather than just
+  // re-deriving it from the label.
   payload?: Record<string, unknown> | null;
 }
 
@@ -85,7 +86,7 @@ export async function sendChatMessage(messages: AgentMessage[]): Promise<ChatApi
 function Chat() {
   // states for chat messages
   const { messages, setMessages, clearMessages } = useChat();
-  const { addAppointment } = useCareRecipientInfo();
+  const { addAppointment, updateRecipientInfo } = useCareRecipientInfo();
   const { createTask } = useTaskInfo();
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -176,6 +177,19 @@ function Chat() {
       setMessages((prev) => [
         ...prev,
         { id: crypto.randomUUID(), role: 'ai', text: `Done — "${label}" has been added to your tasks.` },
+      ]);
+      return;
+    }
+
+    if (type === 'update_patient_info' && payload) {
+      // Patches whichever fields the model included — see
+      // RecipientInfoUpdate in CareRecipientContext.tsx for the allowed
+      // keys. The Patient Profile page reflects this immediately since it
+      // reads from the same shared context.
+      updateRecipientInfo(payload as RecipientInfoUpdate);
+      setMessages((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), role: 'ai', text: `Done — "${label}" has been updated.` },
       ]);
       return;
     }

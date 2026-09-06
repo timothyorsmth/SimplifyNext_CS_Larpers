@@ -51,6 +51,19 @@ export type CareRecipientData = {
     appointments: Appointment[];
 };
 
+// Only the fields the chatbot (or any future UI) is allowed to edit.
+// Anything not listed here (id, medicalHistory, medications, appointments)
+// is intentionally excluded from this update path.
+export type RecipientInfoUpdate = Partial<{
+    first_name: string;
+    last_name: string;
+    dateOfBirth: string;
+    sex: string;
+    bloodType: string;
+    allergies: string[];
+    primaryPhysician: string;
+}>;
+
 // Values that the other files reference
 type CareRecipientContextValue = {
     recipientId: string | null;
@@ -65,6 +78,11 @@ type CareRecipientContextValue = {
     // this, so neither one keeps its own separate local copy that the
     // other can't see.
     addAppointment: (appointment: Omit<Appointment, 'id'>) => void;
+    // Patches one or more personal-info fields on recipientInfo (including
+    // the nested profile name fields). Only the fields present in `update`
+    // are changed — everything else is left untouched. Used by Chat.tsx's
+    // AI-approved "update_patient_info" action.
+    updateRecipientInfo: (update: RecipientInfoUpdate) => void;
 }
 
 // thank you claude
@@ -98,6 +116,28 @@ export function CareRecipientProvider({ children }: { children: React.ReactNode 
         });
     }
 
+    function updateRecipientInfo(update: RecipientInfoUpdate) {
+        setCareRecipient((prev) => {
+            if (!prev) return prev;
+
+            const { first_name, last_name, ...topLevelFields } = update;
+
+            return {
+                ...prev,
+                recipientInfo: {
+                    ...prev.recipientInfo,
+                    ...topLevelFields, // dateOfBirth / sex / bloodType / allergies / primaryPhysician, whichever are present
+                    profile: {
+                        ...prev.recipientInfo.profile,
+                        ...(first_name !== undefined && { first_name }),
+                        ...(last_name !== undefined && { last_name }),
+                    },
+                },
+            };
+            // TODO: PATCH to backend once a real endpoint exists
+        });
+    }
+
     const value: CareRecipientContextValue = {
         careRecipient,
         recipientId: careRecipient?.recipientInfo.id ?? '',
@@ -106,6 +146,7 @@ export function CareRecipientProvider({ children }: { children: React.ReactNode 
         appointments: careRecipient?.appointments ?? [], // default to [] so consumers can .map/.filter without a null check
         loading,
         addAppointment,
+        updateRecipientInfo,
     };
 
     return (

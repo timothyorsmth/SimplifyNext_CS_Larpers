@@ -193,3 +193,49 @@ export async function searchRelevantSchemes(condition: string): Promise<SchemeRe
     })
     .slice(0, 12);
 }
+
+// Searches each condition independently and merges the results, rather than
+// joining every condition into one string and searching that as a single
+// query. A joined string like "Type 2 Diabetes Hypertension" never matches
+// any real article as a phrase, and splits into generic single words (e.g.
+// "type") that spuriously match unrelated articles — this keeps each
+// condition's phrase-matching meaningful and article relevance accurate for
+// patients with more than one condition.
+export async function searchRelevantSchemesForConditions(
+  conditions: string[],
+): Promise<SchemeResult[]> {
+  const cleanedConditions = conditions.map(c => c.trim()).filter(Boolean);
+  if (cleanedConditions.length === 0) return [];
+
+  const resultsPerCondition = await Promise.all(
+    cleanedConditions.map(condition => searchRelevantSchemes(condition)),
+  );
+
+  const merged = new Map<string, SchemeResult>();
+
+  resultsPerCondition.forEach(results => {
+    results.forEach(article => {
+      const existing = merged.get(article.url);
+      if (!existing) {
+        merged.set(article.url, article);
+        return;
+      }
+      // An article relevant to more than one of the patient's conditions
+      // should rank higher than one relevant to only one — add the scores
+      // rather than keeping just the first condition's result.
+      merged.set(article.url, {
+        ...existing,
+        relevanceScore: existing.relevanceScore + article.relevanceScore,
+        recommended: existing.recommended || article.recommended,
+      });
+    });
+  });
+
+  return Array.from(merged.values())
+    .sort((a, b) => {
+      const scoreA = (a.recommended ? 100 : 0) + a.relevanceScore * 10 + a.sourceQuality * 5 + a.sentimentScore;
+      const scoreB = (b.recommended ? 100 : 0) + b.relevanceScore * 10 + b.sourceQuality * 5 + b.sentimentScore;
+      return scoreB - scoreA;
+    })
+    .slice(0, 12);
+}

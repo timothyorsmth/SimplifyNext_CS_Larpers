@@ -3,7 +3,7 @@ import './Articles.css';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useCareRecipientInfo } from '../../Context/CareRecipientContext';
-import { searchRelevantSchemes } from './articleSearch';
+import { searchRelevantSchemesForConditions } from './articleSearch';
 import type { SchemeResult } from './articleSearch';
 
 interface ArticleListProps {
@@ -11,45 +11,49 @@ interface ArticleListProps {
   medicalHistory?: string | string[] | null;
 }
 
-function getHistoryQuery(medicalHistory: ArticleListProps['medicalHistory']) {
+function getHistoryConditions(medicalHistory: ArticleListProps['medicalHistory']): string[] {
   if (Array.isArray(medicalHistory)) {
-    return medicalHistory.filter(Boolean).join(' ').trim();
+    return medicalHistory.map(c => c.trim()).filter(Boolean);
   }
-
-  return medicalHistory?.trim() ?? '';
+  const trimmed = medicalHistory?.trim();
+  return trimmed ? [trimmed] : [];
 }
 
 function ArticleList({ medicalHistory }: ArticleListProps) {
   const { careRecipient, loading: recipientLoading } = useCareRecipientInfo();
   const contextMedicalHistory = careRecipient?.medicalHistory.map(entry => entry.condition);
   const effectiveMedicalHistory = medicalHistory ?? contextMedicalHistory;
-  const query = useMemo(() => getHistoryQuery(effectiveMedicalHistory), [effectiveMedicalHistory]);
+  const conditions = useMemo(() => getHistoryConditions(effectiveMedicalHistory), [effectiveMedicalHistory]);
+  // Stable cache key for "have we already searched for this exact set of
+  // conditions" — used instead of comparing arrays by reference.
+  const conditionsKey = conditions.join('|');
+
   const [searchState, setSearchState] = useState<{
-    query: string;
+    key: string;
     articles: SchemeResult[];
     error: string;
-  }>({ query: '', articles: [], error: '' });
+  }>({ key: '', articles: [], error: '' });
 
-  const loading = recipientLoading || (Boolean(query) && searchState.query !== query);
-  const error = searchState.query === query ? searchState.error : '';
+  const loading = recipientLoading || (conditions.length > 0 && searchState.key !== conditionsKey);
+  const error = searchState.key === conditionsKey ? searchState.error : '';
 
   useEffect(() => {
     let cancelled = false;
 
-    if (!query) {
+    if (conditions.length === 0) {
       return () => {
         cancelled = true;
       };
     }
 
-    searchRelevantSchemes(query)
+    searchRelevantSchemesForConditions(conditions)
       .then(results => {
-        if (!cancelled) setSearchState({ query, articles: results, error: '' });
+        if (!cancelled) setSearchState({ key: conditionsKey, articles: results, error: '' });
       })
       .catch(searchError => {
         if (cancelled) return;
         setSearchState({
-          query,
+          key: conditionsKey,
           articles: [],
           error: searchError instanceof Error ? searchError.message : 'Unable to load articles right now.',
         });
@@ -58,14 +62,15 @@ function ArticleList({ medicalHistory }: ArticleListProps) {
     return () => {
       cancelled = true;
     };
-  }, [query]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conditionsKey]);
 
   const visibleArticles = useMemo(() => {
-    if (!query) return [];
-    const articles = searchState.query === query ? searchState.articles : [];
+    if (conditions.length === 0) return [];
+    const articles = searchState.key === conditionsKey ? searchState.articles : [];
     const recommended = articles.filter(article => article.recommended);
     return (recommended.length > 0 ? recommended : articles).slice(0, 2);
-  }, [query, searchState]);
+  }, [conditions, conditionsKey, searchState]);
 
   return (
     <section className="ArticleList" aria-labelledby="articles-heading" aria-busy={loading}>
@@ -99,11 +104,11 @@ function ArticleList({ medicalHistory }: ArticleListProps) {
         ))}
       </div>
 
-      {!loading && !error && !query && (
+      {!loading && !error && conditions.length === 0 && (
         <p className="ArticleList__empty">Articles will appear here using the patient&apos;s medical history.</p>
       )}
 
-      {!loading && !error && query && visibleArticles.length === 0 && (
+      {!loading && !error && conditions.length > 0 && visibleArticles.length === 0 && (
         <p className="ArticleList__empty">No suitable articles were found yet.</p>
       )}
     </section>
