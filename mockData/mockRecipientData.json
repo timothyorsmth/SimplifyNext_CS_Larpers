@@ -68,18 +68,30 @@
       "type": "Physical Therapy",
       "date": "2026-09-06T14:40:00",
       "provider": "Dr. Andrew Garfield",
-      "location": "Tan Tock Seng Hospital East Wing 04-14",
+      "hospital": "Alexandra Hospital",
+      "location": "East Wing 04-14",
+      "specialisation": "Orthopedic Surgery",
       "status": "upcoming",
-      "notes": null
+      "notes": null,
+      "followUpOf": null,
+      "recommendedFollowUp": null
     },
     {
       "id": "appt2",
       "type": "Diabetes Checkup",
       "date": "2025-11-03T09:00:00",
       "provider": "Dr. Jackie Lim",
-      "location": "Ng Teng Fong Hospital Orthopedic Ward 12-03",
+      "hospital": "Ng Teng Fong Hospital",
+      "location": "Endocrinology Ward 12-03",
+      "specialisation": "Endocrinology",
       "status": "completed",
-      "notes": "HbA1c 7.1%, advised to reduce sugar intake"
+      "notes": "HbA1c 7.1%, advised to reduce sugar intake",
+      "followUpOf": null,
+      "recommendedFollowUp": {
+        "suggested": true,
+        "withinDays": 90,
+        "reason": "Routine diabetes monitoring"
+      }
     }
   ]
 }

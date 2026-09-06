@@ -32,3 +32,141 @@
     justify-content: end;
     align-items: center;
 }
+
+.UpcomingActivitiesCard {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: #d9d9d9;
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 16px;
+  cursor: pointer;
+}
+ 
+.UpcomingActivitiesLabel {
+  display: flex;
+  flex-direction: column;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+ 
+.UpcomingActivitiesDate {
+  font-weight: 400;
+  font-size: 13px;
+  color: #4a4a4a;
+  margin-top: 4px;
+}
+ 
+.UpcomingActivitiesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+ 
+.UpcomingActivityRow {
+  background: #bfbfbf;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+ 
+.UpcomingActivityRow--empty {
+  text-align: center;
+  color: #4a4a4a;
+}
+ 
+.UpcomingActivityTime {
+  display: block;
+  font-weight: 700;
+}
+ 
+.UpcomingActivityType {
+  display: block;
+  font-size: 14px;
+}
+ 
+/* --- Your Tasks --- */
+ 
+.SectionTitle {
+  font-size: 18px;
+  margin: 20px 0 10px;
+}
+ 
+.YourTasksRow {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 4px 14px; /* bottom padding gives the custom scrollbar room to sit below the cards, not overlapping them */
+  scroll-snap-type: x proximity; /* cards settle into place instead of stopping mid-scroll */
+
+  /* Firefox: thin, muted scrollbar instead of the default chunky one */
+  scrollbar-width: thin;
+  scrollbar-color: #b5b0a8 transparent;
+}
+
+/* Chrome/Safari/Edge: custom scrollbar track + thumb */
+.YourTasksRow::-webkit-scrollbar {
+  height: 6px;
+}
+.YourTasksRow::-webkit-scrollbar-track {
+  background: transparent;
+}
+.YourTasksRow::-webkit-scrollbar-thumb {
+  background: #d6d2c9;
+  border-radius: 999px;
+}
+.YourTasksRow::-webkit-scrollbar-thumb:hover {
+  background: #b5b0a8;
+}
+
+.DashboardTaskCard {
+  flex: 0 0 150px;
+  min-width: 0;
+  scroll-snap-align: start;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #d4d1cb; /* slightly warmer than pure gray to match your cream page bg */
+  border-radius: 16px;
+  padding: 16px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.DashboardTaskCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.DashboardTaskIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  font-size: 18px;
+  color: #1f2f4d;
+}
+
+.DashboardTaskName {
+  font-weight: 700;
+  font-size: 15px;
+  color: #1f2f4d;
+  line-height: 1.25;
+}
+
+.DashboardTaskStatus {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Distinguish "still to do" from "overdue" at a glance, rather than
+   both reading as the same gray text */
+.DashboardTaskCard--overdue .DashboardTaskStatus {
+  color: #b3452c;
+}
+.DashboardTaskCard--ontrack .DashboardTaskStatus {
+  color: #6b6b6b;
+}

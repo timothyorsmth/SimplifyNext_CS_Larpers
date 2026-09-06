@@ -7,14 +7,17 @@ import { ChatProvider } from './Context/ChatContext.tsx'
 
 import App from './App.tsx'
 import "./index.css"
+import { TaskProvider } from './Context/TaskContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CaregiverProvider>
     <CareRecipientProvider>
+    <TaskProvider>
     <ChatProvider>
       <App />
     </ChatProvider>
+    </TaskProvider>
     </ CareRecipientProvider>
     </CaregiverProvider>
   </StrictMode>,
