@@ -1,0 +1,303 @@
+[
+  {
+    "id": "anthropic.claude-sonnet-4-20250514-v1:0",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "NEEDS_INFERENCE_PROFILE",
+    "detail": "Invocation of model ID anthropic.claude-sonnet-4-20250514-v1:0 with on-demand throughput isn\u2019t supported. Retry your request with the ID or ARN of an inference profile that contains this model."
+  },
+  {
+    "id": "anthropic.claude-haiku-4-5-20251001-v1:0",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "NEEDS_INFERENCE_PROFILE",
+    "detail": "Invocation of model ID anthropic.claude-haiku-4-5-20251001-v1:0 with on-demand throughput isn\u2019t supported. Retry your request with the ID or ARN of an inference profile that contains this model."
+  },
+  {
+    "id": "anthropic.claude-fable-5",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-fable-5 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "anthropic.claude-sonnet-4-6",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "NEEDS_INFERENCE_PROFILE",
+    "detail": "Invocation of model ID anthropic.claude-sonnet-4-6 with on-demand throughput isn\u2019t supported. Retry your request with the ID or ARN of an inference profile that contains this model."
+  },
+  {
+    "id": "anthropic.claude-opus-4-6-v1",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "NEEDS_INFERENCE_PROFILE",
+    "detail": "Invocation of model ID anthropic.claude-opus-4-6-v1 with on-demand throughput isn\u2019t supported. Retry your request with the ID or ARN of an inference profile that contains this model."
+  },
+  {
+    "id": "anthropic.claude-opus-5",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-opus-5 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "anthropic.claude-opus-4-8",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-opus-4-8 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "anthropic.claude-opus-4-7",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-opus-4-7 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "NEEDS_INFERENCE_PROFILE",
+    "detail": "Invocation of model ID anthropic.claude-sonnet-4-5-20250929-v1:0 with on-demand throughput isn\u2019t supported. Retry your request with the ID or ARN of an inference profile that contains this model."
+  },
+  {
+    "id": "anthropic.claude-fable-5-1",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-fable-5-1 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "anthropic.claude-sonnet-5",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-sonnet-5 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "anthropic.claude-opus-4-1-20250805-v1:0",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "NEEDS_INFERENCE_PROFILE",
+    "detail": "Invocation of model ID anthropic.claude-opus-4-1-20250805-v1:0 with on-demand throughput isn\u2019t supported. Retry your request with the ID or ARN of an inference profile that contains this model."
+  },
+  {
+    "id": "anthropic.claude-opus-4-5-20251101-v1:0",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "NEEDS_INFERENCE_PROFILE",
+    "detail": "Invocation of model ID anthropic.claude-opus-4-5-20251101-v1:0 with on-demand throughput isn\u2019t supported. Retry your request with the ID or ARN of an inference profile that contains this model."
+  },
+  {
+    "id": "anthropic.claude-3-haiku-20240307-v1:0:48k",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "NOT_FOUND",
+    "detail": "Model not found."
+  },
+  {
+    "id": "anthropic.claude-3-haiku-20240307-v1:0:200k",
+    "type": "foundation-model",
+    "on_demand_supported": false,
+    "status": "NOT_FOUND",
+    "detail": "Model not found."
+  },
+  {
+    "id": "anthropic.claude-3-haiku-20240307-v1:0",
+    "type": "foundation-model",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "us.anthropic.claude-3-sonnet-20240229-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "NOT_FOUND",
+    "detail": "This model version has reached the end of its life. Please refer to the AWS documentation for more details."
+  },
+  {
+    "id": "us.anthropic.claude-3-haiku-20240307-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "us.anthropic.claude-opus-4-1-20250805-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "us.anthropic.claude-sonnet-4-6",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "us.anthropic.claude-opus-4-7",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-opus-4-7 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "us.anthropic.claude-sonnet-4-20250514-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "global.anthropic.claude-sonnet-4-20250514-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "global.anthropic.claude-opus-4-5-20251101-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "global.anthropic.claude-opus-4-7",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-opus-4-7 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "us.anthropic.claude-opus-4-8",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-opus-4-8 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "global.anthropic.claude-opus-4-8",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-opus-4-8 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "us.anthropic.claude-fable-5",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-fable-5 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "global.anthropic.claude-fable-5",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-fable-5 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "us.anthropic.claude-sonnet-5",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-sonnet-5 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "us.anthropic.claude-opus-5",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-opus-5 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "global.anthropic.claude-sonnet-5",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-sonnet-5 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "global.anthropic.claude-opus-5",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-opus-5 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "us.anthropic.claude-opus-4-6-v1",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "global.anthropic.claude-opus-4-6-v1",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "us.anthropic.claude-fable-5-1",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-fable-5-1 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "global.anthropic.claude-fable-5-1",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "IAM_DENIED_OR_NO_MODEL_ACCESS",
+    "detail": "anthropic.claude-fable-5-1 is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/"
+  },
+  {
+    "id": "global.anthropic.claude-sonnet-4-6",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  },
+  {
+    "id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "type": "inference-profile",
+    "on_demand_supported": true,
+    "status": "THROTTLED_RETRY",
+    "detail": "Too many tokens per day, please wait before trying again."
+  }
+]
