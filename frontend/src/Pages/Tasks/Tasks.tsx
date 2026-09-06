@@ -4,10 +4,16 @@ import './Tasks.css';
 // Import dependencies
 import { useState, useEffect } from "react";
 import type { IconType } from "react-icons";
+<<<<<<< Updated upstream
 import { FiUser } from "react-icons/fi";
 import { FaPills, FaCar } from "react-icons/fa";
 import { useCareRecipientInfo } from "../../Context/CareRecipientContext";
 import { getCaregiverInfo } from '../../Context/CaregiverContext';
+=======
+import { FiUser, FiZap } from "react-icons/fi";
+import { FaPills, FaCar, FaHospitalAlt } from "react-icons/fa";
+import { useCareRecipientInfo } from "../../Context/CareRecipientContext";
+>>>>>>> Stashed changes
 
 // Import context
 
@@ -28,7 +34,6 @@ interface Task {
 // TODO: move sample data into a json file
 // TODO: add task completion functionality
 // TODO: add task overdue functionality
-// TODO: add task creation agent
 
 // Mock data (MOVE TO JSON PLEASE)
 const INITIAL_TASKS: Task[] = [
@@ -57,8 +62,13 @@ const INITIAL_TASKS: Task[] = [
   {
     id: "t3",
     name: "Go to KKH",
+<<<<<<< Updated upstream
     icon: "car",
     finishDate: "2029-09-04",
+=======
+    icon: "hospital",
+    finishDate: "2026-09-04",
+>>>>>>> Stashed changes
     finishBefore: "14:00",
     repeat: "never",
     assignedTo: "Tan Wei Jie",
@@ -69,9 +79,18 @@ const INITIAL_TASKS: Task[] = [
 
 const ICON_MAP: Record<string, IconType> = {
   pill: FaPills,
+  hospital: FaHospitalAlt,
   car: FaCar,
 };
- 
+
+// Options shown in the "Create Task" icon dropdown. Kept in sync with
+// ICON_MAP above — add an entry here whenever a new icon is added there.
+const ICON_OPTIONS: { value: string; label: string }[] = [
+  { value: "pill", label: "Medication" },
+  { value: "hospital", label: "Appointment" },
+  { value: "car", label: "Transport" },
+];
+
 interface CreateTaskPopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -79,8 +98,6 @@ interface CreateTaskPopupProps {
   assignablePeople: string[];
 }
 
-
- 
 function CreateTaskPopup({
   isOpen,
   onClose,
@@ -88,6 +105,7 @@ function CreateTaskPopup({
   assignablePeople,
 }: CreateTaskPopupProps) {
   const [name, setName] = useState("");
+  const [icon, setIcon] = useState<string>(ICON_OPTIONS[0].value);
   const [repeat, setRepeat] = useState<Task["repeat"]>("never");
   const [assignedTo, setAssignedTo] = useState(assignablePeople[0] ?? "");
   const [finishDate, setFinishDate] = useState(
@@ -95,6 +113,7 @@ function CreateTaskPopup({
   );
   const [finishBefore, setFinishBefore] = useState("12:00");
 
+<<<<<<< Updated upstream
   // Keep the selected assignee valid as the real caregiver list arrives
   // (assignablePeople starts empty while CaregiverContext is still loading)
   useEffect(() => {
@@ -103,13 +122,15 @@ function CreateTaskPopup({
     }
   }, [assignablePeople]);
  
+=======
+>>>>>>> Stashed changes
   if (!isOpen) return null;
- 
+
   const handleCreate = () => {
     if (!name.trim()) return; // basic guard, no toast needed for demo
     onCreate({
       name: name.trim(),
-      icon: "pill",
+      icon,
       finishDate,
       finishBefore,
       repeat,
@@ -117,13 +138,13 @@ function CreateTaskPopup({
       overdue: false,
     });
     setName("");
+    setIcon(ICON_OPTIONS[0].value);
     setFinishDate(new Date().toISOString().split("T")[0]);
     setFinishBefore("12:00");
     setRepeat("never");
     onClose();
   };
-  
-  // TODO: add icon button functionality
+
   // TODO: add delete task button
   return (
     <div className="taskPopupOverlay" onClick={onClose}>
@@ -137,13 +158,21 @@ function CreateTaskPopup({
             onChange={(e) => setName(e.target.value)}
           />
 
-          <button className="taskIconButton" type="button">
-            icon
-          </button>
+          <select
+            className="taskIconSelect"
+            value={icon}
+            onChange={(e) => setIcon(e.target.value)}
+          >
+            {ICON_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <span className="taskPopupLabel">Finish before:</span>
-        <div className="taskPopupRow taskPopupLabel">
+        <div className="taskPopupRow taskPopupDateRow">
           <div className="taskPopupDateTimeGroup">
             <input
               className="taskPopupDate"
@@ -159,7 +188,7 @@ function CreateTaskPopup({
             />
           </div>
         </div>
- 
+
         <div className="taskPopupSection">
           <span className="taskPopupLabel">Repeat Task</span>
           <div className="taskPopupPillGroup">
@@ -178,7 +207,7 @@ function CreateTaskPopup({
             ))}
           </div>
         </div>
- 
+
         <div className="taskPopupSection">
           <span className="taskPopupLabel">Assign Person</span>
           <select
@@ -193,7 +222,7 @@ function CreateTaskPopup({
             ))}
           </select>
         </div>
- 
+
         <button
           className="taskPopupCreateButton"
           type="button"
@@ -206,38 +235,253 @@ function CreateTaskPopup({
   );
 }
 
+// --- Agentic AI task creator ---
+// The agent can either finish immediately with a task, or ask a clarifying
+// question first (e.g. "who is this for?" / "what time?"). The frontend just
+// keeps forwarding the conversation until the backend returns status "done".
+
+interface AgentMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+type ParsedAgentTask = Omit<Task, "id" | "completed" | "overdue">;
+
+interface AgentClarifyResponse {
+  status: "clarify";
+  question: string;
+}
+
+interface AgentDoneResponse {
+  status: "done";
+  task: ParsedAgentTask;
+}
+
+type AgentResponse = AgentClarifyResponse | AgentDoneResponse;
+
+// The FastAPI backend runs on its own origin/port, separate from the Vite
+// dev server — that's why main.py has CORSMiddleware at all. A relative
+// fetch("/api/tasks/agent") from a page served by Vite would hit Vite
+// itself (404), not FastAPI. Set VITE_API_BASE_URL in your .env if the
+// backend isn't on the default 8000.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+
+async function callTaskAgent(
+  messages: AgentMessage[],
+  assignablePeople: string[]
+): Promise<AgentResponse> {
+  const res = await fetch(`${API_BASE_URL}/api/tasks/agent`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messages,
+      assignablePeople,
+      today: new Date().toISOString().split("T")[0],
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Task agent request failed with status ${res.status}`);
+  }
+
+  return res.json();
+}
+
+interface AiTaskCreatorProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onCreate: (task: Omit<Task, "id" | "completed">) => void;
+  assignablePeople: string[];
+}
+
+function AiTaskCreator({
+  isOpen,
+  onClose,
+  onCreate,
+  assignablePeople,
+}: AiTaskCreatorProps) {
+  const [messages, setMessages] = useState<AgentMessage[]>([]);
+  const [input, setInput] = useState("");
+  const [isThinking, setIsThinking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pendingTask, setPendingTask] = useState<ParsedAgentTask | null>(null);
+
+  if (!isOpen) return null;
+
+  const resetAndClose = () => {
+    setMessages([]);
+    setInput("");
+    setError(null);
+    setPendingTask(null);
+    onClose();
+  };
+
+  const handleSend = async () => {
+    const trimmed = input.trim();
+    if (!trimmed || isThinking) return;
+
+    const nextMessages: AgentMessage[] = [
+      ...messages,
+      { role: "user", content: trimmed },
+    ];
+    setMessages(nextMessages);
+    setInput("");
+    setIsThinking(true);
+    setError(null);
+
+    try {
+      const response = await callTaskAgent(nextMessages, assignablePeople);
+
+      if (response.status === "clarify") {
+        setMessages([
+          ...nextMessages,
+          { role: "assistant", content: response.question },
+        ]);
+      } else {
+        setPendingTask(response.task);
+        setMessages([
+          ...nextMessages,
+          {
+            role: "assistant",
+            content: `Got it — ready to create "${response.task.name}".`,
+          },
+        ]);
+      }
+    } catch (err) {
+      setError("Couldn't reach the assistant. Please try again.");
+    } finally {
+      setIsThinking(false);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (!pendingTask) return;
+    onCreate({ ...pendingTask, overdue: false });
+    resetAndClose();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  return (
+    <div className="taskPopupOverlay" onClick={resetAndClose}>
+      <div className="aiTaskPopup" onClick={(e) => e.stopPropagation()}>
+        <span className="taskPopupLabel">Describe the task</span>
+
+        <div className="aiTaskChatLog">
+          {messages.length === 0 && (
+            <div className="aiTaskChatHint">
+              e.g. "Remind Mum to take her meds every morning at 9am"
+            </div>
+          )}
+          {messages.map((m, i) => (
+            <div
+              key={i}
+              className={
+                "aiTaskChatBubble" +
+                (m.role === "user"
+                  ? " aiTaskChatBubble--user"
+                  : " aiTaskChatBubble--assistant")
+              }
+            >
+              {m.content}
+            </div>
+          ))}
+          {isThinking && (
+            <div className="aiTaskChatBubble aiTaskChatBubble--assistant">
+              Thinking…
+            </div>
+          )}
+        </div>
+
+        {error && <div className="aiTaskError">{error}</div>}
+
+        {pendingTask ? (
+          <div className="aiTaskPreviewCard">
+            <div className="aiTaskPreviewName">{pendingTask.name}</div>
+            <div className="aiTaskPreviewMeta">
+              Due {pendingTask.finishDate} by {pendingTask.finishBefore} ·{" "}
+              {pendingTask.repeat} · {pendingTask.assignedTo}
+            </div>
+            <div className="aiTaskPreviewActions">
+              <button
+                type="button"
+                className="taskPopupPill"
+                onClick={() => setPendingTask(null)}
+              >
+                Keep editing
+              </button>
+              <button
+                type="button"
+                className="taskPopupCreateButton"
+                onClick={handleConfirm}
+              >
+                Confirm &amp; Create
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="taskPopupRow">
+            <input
+              className="taskInputName"
+              type="text"
+              placeholder="Type a task in plain English..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isThinking}
+            />
+            <button
+              className="taskPopupCreateButton"
+              type="button"
+              onClick={handleSend}
+              disabled={isThinking || !input.trim()}
+            >
+              Send
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Tasks() {
+<<<<<<< Updated upstream
   const { careRecipient } = useCareRecipientInfo(); 
   const { caregivers } = getCaregiverInfo();
+=======
+  const { careRecipient } = useCareRecipientInfo();
+>>>>>>> Stashed changes
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isModalOpen, setModalOpen] = useState(false);
-
-  // Recheck every minute so the page updates live without a refresh
+  const [isAiModalOpen, setAiModalOpen] = useState(false);
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    // Find the soonest deadline among tasks that aren't done yet
     const upcoming = tasks
       .filter((t) => !t.completed)
       .map((t) => {
         const [h, m] = t.finishBefore.split(":").map(Number);
-        const deadline = new Date(); // "today" — swap for finishDate if you added it
+        const deadline = new Date(t.finishDate); // use the task's actual date, not "today"
         deadline.setHours(h, m, 0, 0);
         return deadline.getTime();
       })
       .filter((ms) => ms > now.getTime());
 
-    if (upcoming.length === 0) return; // nothing left to become overdue
+    if (upcoming.length === 0) return;
 
     const nextDeadline = Math.min(...upcoming);
-    // +1s buffer so `now` lands just after the deadline, not exactly on it
     const msUntilNext = nextDeadline - now.getTime() + 1000;
 
     const timeout = setTimeout(() => setNow(new Date()), msUntilNext);
     return () => clearTimeout(timeout);
   }, [tasks, now]);
 
-  // "HH:MM" -> has that time-of-day already passed today?
   const isPastDeadline = (finishDate: string, finishBefore: string) => {
     const [h, m] = finishBefore.split(":").map(Number);
     const deadline = new Date(finishDate);
@@ -250,6 +494,7 @@ function Tasks() {
     return { ...t, overdue };
   });
 
+<<<<<<< Updated upstream
   const incompleteTasks = effectiveTasks.find((t) => t.overdue);
   const otherTasks = effectiveTasks.filter((t) => t !== incompleteTasks);
  
@@ -257,6 +502,17 @@ function Tasks() {
     .filter((c) => c.recipientId === careRecipient?.recipientInfo.id) // only people caring for this recipient
     .map((c) => `${c.profile.first_name} ${c.profile.last_name}`);
  
+=======
+  const highlightedTask = effectiveTasks.find((t) => t.overdue);
+  const otherTasks = effectiveTasks.filter((t) => t !== highlightedTask);
+
+  const recipientFirstName = careRecipient?.recipientInfo?.profile?.first_name;
+  const recipientLastName = careRecipient?.recipientInfo?.profile?.last_name;
+  const assignablePeople = [
+    recipientFirstName && recipientLastName ? `${recipientFirstName} ${recipientLastName}` : null
+  ].filter((v, i, arr): v is string => !!v && arr.indexOf(v) === i);
+
+>>>>>>> Stashed changes
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed">) => {
     setTasks((prev) => [
       ...prev,
@@ -265,6 +521,7 @@ function Tasks() {
     // TODO: POST to backend / write to mock JSON via api/ layer
   };
 
+<<<<<<< Updated upstream
   const toggleTaskCompleted = (id: string) => {
     setTasks((prev) =>
       prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
@@ -278,6 +535,14 @@ function Tasks() {
  
       {incompleteTasks && (() => {
         const HighlightIcon = ICON_MAP[incompleteTasks.icon];
+=======
+  return (
+    <div className="tasksPage">
+      <h1 className="title">Today's Tasks</h1>
+
+      {highlightedTask && (() => {
+        const HighlightIcon = ICON_MAP[highlightedTask.icon];
+>>>>>>> Stashed changes
         return (
           <div
             className="incompleteTaskCard"
@@ -297,14 +562,14 @@ function Tasks() {
                 {HighlightIcon && <HighlightIcon />}
               </span>
               <div>
-                <div className="incompleteTaskName">{incompleteTasks.name}</div>
+                <div className="incompleteTaskName">{highlightedTask.name}</div>
                 <div className="incompleteTaskTag">Overdue</div>
               </div>
             </div>
           </div>
         );
       })()}
- 
+
       <div className="taskRows">
         {otherTasks.map((task) => {
           const RowIcon = ICON_MAP[task.icon];
@@ -331,18 +596,34 @@ function Tasks() {
           );
         })}
       </div>
- 
-      <button
-        className="taskCreateButton"
-        type="button"
-        onClick={() => setModalOpen(true)}
-      >
-        Create Task
-      </button>
- 
+
+      <div className="taskCreateButtonRow">
+        <button
+          className="taskCreateButton"
+          type="button"
+          onClick={() => setModalOpen(true)}
+        >
+          Create Task
+        </button>
+        <button
+          className="taskCreateButton taskCreateButton--ai"
+          type="button"
+          onClick={() => setAiModalOpen(true)}
+        >
+          <FiZap /> Create with AI
+        </button>
+      </div>
+
       <CreateTaskPopup
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
+        onCreate={handleCreateTask}
+        assignablePeople={assignablePeople}
+      />
+
+      <AiTaskCreator
+        isOpen={isAiModalOpen}
+        onClose={() => setAiModalOpen(false)}
         onCreate={handleCreateTask}
         assignablePeople={assignablePeople}
       />
