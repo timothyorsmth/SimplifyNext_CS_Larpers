@@ -4,7 +4,7 @@ import './Tasks.css';
 // Import dependencies
 import { useState, useEffect } from "react";
 import type { IconType } from "react-icons";
-import { FiUser, FiZap } from "react-icons/fi";
+import { FiUser, FiZap, FiX } from "react-icons/fi";
 import { FaPills, FaCar, FaHospitalAlt } from "react-icons/fa";
 import { useCareRecipientInfo } from "../../Context/CareRecipientContext";
 import { getCaregiverInfo } from '../../Context/CaregiverContext';
@@ -77,7 +77,6 @@ function CreateTaskPopup({
     onClose();
   };
 
-  // TODO: add delete task button
   return (
     <div className="taskPopupOverlay" onClick={onClose}>
       <div className="taskPopup" onClick={(e) => e.stopPropagation()}>
@@ -384,7 +383,7 @@ function AiTaskCreator({
 function Tasks() {
   const { careRecipient } = useCareRecipientInfo();
   const { caregivers } = getCaregiverInfo();
-  const { effectiveTasks, createTask, toggleTaskCompleted } = useTaskInfo();
+  const { effectiveTasks, createTask, toggleTaskCompleted, deleteTask } = useTaskInfo();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAiModalOpen, setAiModalOpen] = useState(false);
 
@@ -424,6 +423,17 @@ function Tasks() {
                 <div className="incompleteTaskTag">Overdue</div>
               </div>
             </div>
+            <button
+              className="taskDeleteButton"
+              type="button"
+              aria-label={`Delete ${highlightedTask.name}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteTask(highlightedTask.id);
+              }}
+            >
+              <FiX />
+            </button>
           </div>
         );
       })()}
@@ -450,6 +460,17 @@ function Tasks() {
               <span className="taskPersonAvatar" title={task.assignedTo}>
                 <FiUser />
               </span>
+              <button
+                className="taskDeleteButton"
+                type="button"
+                aria-label={`Delete ${task.name}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteTask(task.id);
+                }}
+              >
+                <FiX />
+              </button>
             </div>
           );
         })}

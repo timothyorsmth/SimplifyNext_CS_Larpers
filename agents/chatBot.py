@@ -237,7 +237,6 @@ CHAT_ACTION_INSTRUCTIONS = (
     "For anything that isn't an appointment or a task request, just reply "
     "normally and never output an ACTION_JSON line.\n"
 )
-
 def getChatSystemPromptWithActions() -> str:
     return getChatBotSystemPrompt() + "\n\n" + CHAT_ACTION_INSTRUCTIONS
 
