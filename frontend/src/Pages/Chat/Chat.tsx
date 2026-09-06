@@ -11,6 +11,8 @@ import { API_BASE } from '../../App'
 import { useChat } from "../../Context/ChatContext";
 import { useCareRecipientInfo } from "../../Context/CareRecipientContext";
 import type { Appointment } from "../../Context/CareRecipientContext";
+import { useTaskInfo } from "../../Context/TaskContext";
+import type { Task } from "../../Context/TaskContext";
 
 
 interface SuggestedActions {
@@ -36,7 +38,8 @@ interface ChatActionResponse {
   type: string;
   // Present when the action carries structured data the frontend needs to
   // actually perform on approval (e.g. the appointment fields for
-  // "create_schedule_item") rather than just re-deriving it from the label.
+  // "create_schedule_item", or the task fields for "create_task") rather
+  // than just re-deriving it from the label.
   payload?: Record<string, unknown> | null;
 }
 
@@ -83,6 +86,7 @@ function Chat() {
   // states for chat messages
   const { messages, setMessages, clearMessages } = useChat();
   const { addAppointment } = useCareRecipientInfo();
+  const { createTask } = useTaskInfo();
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -164,8 +168,20 @@ function Chat() {
       return;
     }
 
-    // TODO: wire up create_task / generate_report / confirm_generic once
-    // those flows exist. For now they just confirm without doing anything.
+    if (type === 'create_task' && payload) {
+      // Same shared store Tasks.tsx's "Create Task" and "Create with AI"
+      // popups write into — the task shows up on the Tasks page without
+      // any extra wiring.
+      createTask(payload as Omit<Task, "id" | "completed">);
+      setMessages((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), role: 'ai', text: `Done — "${label}" has been added to your tasks.` },
+      ]);
+      return;
+    }
+
+    // TODO: wire up generate_report / confirm_generic once those flows exist.
+    // For now they just confirm without doing anything.
     console.log('Approved (not yet wired):', { actionId, type, payload });
     setMessages((prev) => [
       ...prev,

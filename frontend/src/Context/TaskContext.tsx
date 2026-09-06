@@ -57,6 +57,7 @@ type TaskContextValue = {
     effectiveTasks: EffectiveTask[]; // tasks + derived `overdue`, use this for rendering
     createTask: (task: Omit<Task, "id" | "completed">) => void;
     toggleTaskCompleted: (id: string) => void;
+    deleteTask: (id: string) => void;
 };
  
 const TaskContext = createContext<TaskContextValue | null>(null);
@@ -114,12 +115,18 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         );
         // TODO: persist to backend / mock JSON once that layer exists
     };
+
+    const deleteTask = (id: string) => {
+        setTasks((prev) => prev.filter((t) => t.id !== id));
+        // TODO: DELETE to backend / mock JSON once that layer exists
+    };
  
     const value: TaskContextValue = {
         tasks,
         effectiveTasks,
         createTask,
         toggleTaskCompleted,
+        deleteTask,
     };
  
     return (
