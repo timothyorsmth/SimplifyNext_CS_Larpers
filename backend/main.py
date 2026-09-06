@@ -2,6 +2,7 @@ from html import unescape
 from html.parser import HTMLParser
 from urllib.parse import parse_qs, quote_plus, unquote, urlparse
 from urllib.request import Request, urlopen
+from xml.etree import ElementTree
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -173,8 +174,12 @@ def _search_web_articles(query: str, max_results: int = 12) -> list[dict[str, st
             headers={"User-Agent": "Mozilla/5.0 SimplifyNext/1.0"},
         )
 
-        with urlopen(request, timeout=6) as response:
-            html = response.read().decode("utf-8", errors="ignore")
+        try:
+            with urlopen(request, timeout=6) as response:
+                html = response.read().decode("utf-8", errors="ignore")
+        except Exception as e:
+            print(f"Article search source skipped: {e}")
+            continue
 
         parser = _DuckDuckGoResultParser()
         parser.feed(html)
@@ -202,6 +207,44 @@ def _search_web_articles(query: str, max_results: int = 12) -> list[dict[str, st
 
             if len(articles) >= max_results:
                 return articles
+
+    if len(articles) >= 4:
+        return articles
+
+    # DuckDuckGo occasionally returns an anti-bot page to local development
+    # servers. Bing's RSS response is a lightweight fallback that does not
+    # require an API key and still gives the frontend real article links.
+    try:
+        request = Request(
+            f"https://www.bing.com/search?format=rss&q={quote_plus(search_queries[-1])}",
+            headers={"User-Agent": "Mozilla/5.0 SimplifyNext/1.0"},
+        )
+        with urlopen(request, timeout=6) as response:
+            rss = response.read()
+
+        root = ElementTree.fromstring(rss)
+        for item in root.findall("./channel/item"):
+            title = (item.findtext("title") or "").strip()
+            url = (item.findtext("link") or "").strip()
+            summary = (item.findtext("description") or "").strip()
+            parsed_url = urlparse(url)
+            hostname = (parsed_url.hostname or "").lower().removeprefix("www.")
+
+            if not title or parsed_url.scheme not in {"http", "https"} or not hostname or url in seen_urls:
+                continue
+
+            seen_urls.add(url)
+            articles.append({
+                "title": " ".join(unescape(title).split()),
+                "url": url,
+                "summary": " ".join(unescape(summary).split()),
+                "source": hostname,
+            })
+
+            if len(articles) >= max_results:
+                break
+    except Exception as e:
+        print(f"Fallback article search source skipped: {e}")
 
     return articles
 

@@ -2,6 +2,7 @@ import './Articles.css';
 
 import { useEffect, useMemo, useState } from 'react';
 
+import { useCareRecipientInfo } from '../../Context/CareRecipientContext';
 import { searchRelevantSchemes } from './articleSearch';
 import type { SchemeResult } from './articleSearch';
 
@@ -19,14 +20,17 @@ function getHistoryQuery(medicalHistory: ArticleListProps['medicalHistory']) {
 }
 
 function ArticleList({ medicalHistory }: ArticleListProps) {
-  const query = useMemo(() => getHistoryQuery(medicalHistory), [medicalHistory]);
+  const { careRecipient, loading: recipientLoading } = useCareRecipientInfo();
+  const contextMedicalHistory = careRecipient?.medicalHistory.map(entry => entry.condition);
+  const effectiveMedicalHistory = medicalHistory ?? contextMedicalHistory;
+  const query = useMemo(() => getHistoryQuery(effectiveMedicalHistory), [effectiveMedicalHistory]);
   const [searchState, setSearchState] = useState<{
     query: string;
     articles: SchemeResult[];
     error: string;
   }>({ query: '', articles: [], error: '' });
 
-  const loading = Boolean(query) && searchState.query !== query;
+  const loading = recipientLoading || (Boolean(query) && searchState.query !== query);
   const error = searchState.query === query ? searchState.error : '';
 
   useEffect(() => {
