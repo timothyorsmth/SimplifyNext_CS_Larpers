@@ -312,3 +312,30 @@
   font-weight: 700;
   cursor: pointer;
 }
+.incompleteTaskCard {
+  background: var(--colour-warning);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.taskDeleteButton {
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.taskDeleteButton:hover {
+  opacity: 1;
+}
