@@ -205,7 +205,10 @@ CHAT_ACTION_INSTRUCTIONS = (
     "understood.\n"
     "2. On its own new line, at the very end of your reply, output exactly "
     "this (no markdown fences, no extra text after it):\n"
-    'ACTION_JSON: {"label": "<short button label, e.g. \'Add appointment\'>", '
+    'ACTION_JSON: {"label": "<a short, specific button label describing '
+    'THIS appointment -- e.g. \'Add cardiology visit\' or \'Schedule KKH '
+    'checkup\'. Never use the generic word \'appointment\' or \'task\' '
+    'alone.>", '
     '"type": "create_schedule_item", "payload": {"type": "<appointment '
     'title>", "date": "<YYYY-MM-DDTHH:MM:00>", "provider": "<provider name, '
     'or empty string if not given>", "location": "<location, or empty '
@@ -213,7 +216,25 @@ CHAT_ACTION_INSTRUCTIONS = (
     "If you don't yet have enough information to fill that in (most "
     "importantly: a date and time), ask a short clarifying question in "
     "plain text instead, and do NOT output an ACTION_JSON line that turn.\n\n"
-    "For anything that isn't an appointment-scheduling request, just reply "
+    "\nSeparately, if -- and only if -- the caregiver is asking you to "
+    "create a recurring or one-off daily task (e.g. a medication reminder, "
+    "a chore, a check-in -- NOT a medical appointment, which is handled "
+    "above), do both of the following:\n\n"
+    "1. Reply normally, in one or two sentences, confirming what you "
+    "understood.\n"
+    "2. On its own new line, at the very end of your reply, output exactly "
+    "this (no markdown fences, no extra text after it):\n"
+    'ACTION_JSON: {"label": "<a short, specific button label describing '
+    'THIS task -- e.g. \'Add medication reminder\' or \'Schedule KKH trip\'. '
+    'Never use the generic word \'task\' alone.>", '
+    '"type": "create_task", "payload": {"name": "<task name>", '
+    '"icon": "<one of: pill, hospital, car>", '
+    '"finishDate": "<YYYY-MM-DD>", "finishBefore": "<HH:MM>", '
+    '"repeat": "<never|daily|weekly>", "assignedTo": "<caregiver name>"}}\n\n'
+    "If you don't have enough information (most importantly: what the task "
+    "is and what time it's due), ask a short clarifying question in plain "
+    "text instead, and do NOT output an ACTION_JSON line that turn.\n\n"
+    "For anything that isn't an appointment or a task request, just reply "
     "normally and never output an ACTION_JSON line.\n"
 )
 
