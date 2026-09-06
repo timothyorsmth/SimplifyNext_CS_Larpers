@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { fetchUserData } from '../API/CareCircleData';
+import { fetchUserData } from '../API/careCircleData';
 
 // What we import from the JSON file
 // MUST MATCH JSON DATA
