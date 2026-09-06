@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://127.0.0.1:5001';
+const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://127.0.0.1:8001';
 
 export type ArticleCategory = 'Benefits' | 'Funding' | 'Support' | 'Other';
 
@@ -141,7 +141,7 @@ export async function searchRelevantSchemes(condition: string): Promise<SchemeRe
     response = await fetch(`${API_BASE}/api/schemes/search?q=${encodeURIComponent(query)}`);
   } catch {
     throw new Error(
-      `Cannot connect to the article service at ${API_BASE}. Start the backend with uvicorn on port 5001.`,
+      `Cannot connect to the article service at ${API_BASE}. Start the backend with uvicorn on port 8001.`,
     );
   }
 
