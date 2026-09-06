@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { fetchCareRecipientData } from '../API/CareCircleData'
+import { fetchCareRecipientData } from '../API/careCircleData'
 
 // Things to import from JSON data
 type MedicalHistoryEntry = {

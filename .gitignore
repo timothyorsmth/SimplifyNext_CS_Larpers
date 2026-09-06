@@ -37,4 +37,4 @@ layer-app/
 layer-aws/
 layer-data/
 layer-otel/
-frontend/node_modules/
+frontend/node_modules/.venv/
