@@ -11,62 +11,7 @@ import { getCaregiverInfo } from '../../Context/CaregiverContext';
 import { useTaskInfo, type Task } from '../../Context/TaskContext';
 import { API_BASE } from "../../App";
 
-// Import context
 
-// Task Item
-// Could be more complicated, but for demo let's just keep it super simple
-interface Task {
-  id: string;
-  name: string;
-  icon: string; // icon name or react icon component
-  finishDate: string;   // "YYYY-MM-DD"
-  finishBefore: string; // "HH:MM"
-  repeat: "never" | "daily" | "weekly";
-  assignedTo: string; // caregiver / person name
-  overdue: boolean; // the one to highlight in the incomplete section
-  completed: boolean;
-}
-
-// TODO: move sample data into a json file
-// TODO: add task completion functionality
-// TODO: add task overdue functionality
-
-// Mock data (MOVE TO JSON PLEASE)
-const INITIAL_TASKS: Task[] = [
-  {
-    id: "t1",
-    name: "Morning Meds",
-    icon: "pill",
-    finishDate: "2026-09-04",
-    finishBefore: "09:00",
-    repeat: "daily",
-    assignedTo: "Elenor Siew",
-    overdue: false,
-    completed: false,
-  },
-  {
-    id: "t2",
-    name: "Night Meds",
-    icon: "pill",
-    finishDate: "2026-09-04",
-    finishBefore: "21:00",
-    repeat: "daily",
-    assignedTo: "Elenor Siew",
-    overdue: false,
-    completed: false,
-  },
-  {
-    id: "t3",
-    name: "Go to KKH",
-    icon: "hospital",
-    finishDate: "2026-09-04",
-    finishBefore: "14:00",
-    repeat: "never",
-    assignedTo: "Tan Wei Jie",
-    overdue: false,
-    completed: false,
-  },
-];
 
 const ICON_MAP: Record<string, IconType> = {
   pill: FaPills,
@@ -342,7 +287,7 @@ function AiTaskCreator({
 
   const handleConfirm = () => {
     if (!pendingTask) return;
-    onCreate({ ...pendingTask, overdue: false });
+    onCreate(pendingTask); // no `overdue` — Task doesn't have that field anymore
     resetAndClose();
   };
 
@@ -438,68 +383,16 @@ function AiTaskCreator({
 
 function Tasks() {
   const { careRecipient } = useCareRecipientInfo();
-  const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
+  const { caregivers } = getCaregiverInfo();
+  const { effectiveTasks, createTask, toggleTaskCompleted } = useTaskInfo();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAiModalOpen, setAiModalOpen] = useState(false);
-  const [now, setNow] = useState(() => new Date());
-
-  useEffect(() => {
-    const upcoming = tasks
-      .filter((t) => !t.completed)
-      .map((t) => {
-        const [h, m] = t.finishBefore.split(":").map(Number);
-        const deadline = new Date(t.finishDate); // use the task's actual date, not "today"
-        deadline.setHours(h, m, 0, 0);
-        return deadline.getTime();
-      })
-      .filter((ms) => ms > now.getTime());
-
-    if (upcoming.length === 0) return;
-
-    const nextDeadline = Math.min(...upcoming);
-    const msUntilNext = nextDeadline - now.getTime() + 1000;
-
-    const timeout = setTimeout(() => setNow(new Date()), msUntilNext);
-    return () => clearTimeout(timeout);
-  }, [tasks, now]);
-
-  const isPastDeadline = (finishDate: string, finishBefore: string) => {
-    const [h, m] = finishBefore.split(":").map(Number);
-    const deadline = new Date(finishDate);
-    deadline.setHours(h, m, 0, 0);
-    return now > deadline;
-  };
-
-  const effectiveTasks = tasks.map((t) => {
-    const overdue = !t.completed && isPastDeadline(t.finishDate, t.finishBefore);
-    return { ...t, overdue };
-  });
 
   const highlightedTask = effectiveTasks.find((t) => t.overdue);
   const otherTasks = effectiveTasks.filter((t) => t !== highlightedTask);
 
-  const recipientFirstName = careRecipient?.recipientInfo?.profile?.first_name;
-  const recipientLastName = careRecipient?.recipientInfo?.profile?.last_name;
-  const assignablePeople = [
-    recipientFirstName && recipientLastName ? `${recipientFirstName} ${recipientLastName}` : null
-  ].filter((v, i, arr): v is string => !!v && arr.indexOf(v) === i);
-
-  const handleCreateTask = (newTask: Omit<Task, "id" | "completed">) => {
-    setTasks((prev) => [
-      ...prev,
-      { ...newTask, id: `t${Date.now()}`, completed: false },
-    ]);
-    // TODO: POST to backend / write to mock JSON via api/ layer
-  };
-  const { caregivers } = getCaregiverInfo();
-  const { effectiveTasks, createTask, toggleTaskCompleted } = useTaskInfo();
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  const incompleteTasks = effectiveTasks.find((t) => t.overdue);
-  const otherTasks = effectiveTasks.filter((t) => t !== incompleteTasks);
-
   const assignablePeople = caregivers
-    .filter((c) => c.recipientId === careRecipient?.recipientInfo.id) // only people caring for this recipient
+    .filter((c) => c.recipientId === careRecipient?.recipientInfo.id)
     .map((c) => `${c.profile.first_name} ${c.profile.last_name}`);
 
   return (
@@ -509,7 +402,18 @@ function Tasks() {
       {highlightedTask && (() => {
         const HighlightIcon = ICON_MAP[highlightedTask.icon];
         return (
-          <div className="incompleteTaskCard">
+          <div
+            className="incompleteTaskCard"
+            onClick={() => toggleTaskCompleted(highlightedTask.id)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggleTaskCompleted(highlightedTask.id);
+              }
+            }}
+          >
             <span className="incompleteTaskLabel">Incomplete Tasks:</span>
             <div className="incompleteTaskContainer">
               <span className="taskIcon">
@@ -528,7 +432,19 @@ function Tasks() {
         {otherTasks.map((task) => {
           const RowIcon = ICON_MAP[task.icon];
           return (
-            <div key={task.id} className="taskContainer">
+            <div
+              key={task.id}
+              className={`taskContainer${task.completed ? " taskContainer--completed" : ""}`}
+              onClick={() => toggleTaskCompleted(task.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  toggleTaskCompleted(task.id);
+                }
+              }}
+            >
               <span className="taskIcon">{RowIcon && <RowIcon />}</span>
               <span className="taskName">{task.name}</span>
               <span className="taskPersonAvatar" title={task.assignedTo}>
@@ -555,13 +471,6 @@ function Tasks() {
           <FiZap /> Create with AI
         </button>
       </div>
-      <button
-        className="taskCreateButton"
-        type="button"
-        onClick={() => setModalOpen(true)}
-      >
-        Create Task
-      </button>
 
       <CreateTaskPopup
         isOpen={isModalOpen}
@@ -573,7 +482,7 @@ function Tasks() {
       <AiTaskCreator
         isOpen={isAiModalOpen}
         onClose={() => setAiModalOpen(false)}
-        onCreate={handleCreateTask}
+        onCreate={createTask}
         assignablePeople={assignablePeople}
       />
     </div>

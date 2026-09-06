@@ -14,7 +14,7 @@ import NavBar from './Components/NavBar/NavBar'
 
 // idt this should be here
 // Where should I move it..... much 2 think about
-export const API_BASE = "http://localhost:8001";
+export const API_BASE = "http://localhost:5000";
 
 function App() {
 

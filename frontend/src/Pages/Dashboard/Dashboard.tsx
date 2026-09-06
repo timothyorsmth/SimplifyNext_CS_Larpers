@@ -66,8 +66,7 @@ function Dashboard() {
         {/* Upcoming Activities */}
         <Link to="/schedule" className="UpcomingActivitiesCard">
             <div className="UpcomingActivitiesLabel">
-            <span>Upcoming</span>
-            <strong>Activities:</strong>
+            <strong>Upcoming activities:</strong>
             {nextDateKey && <span className="UpcomingActivitiesDate">{formatDateHeader(new Date(nextDateKey))}</span>}
             </div>
             <div className="UpcomingActivitiesList">

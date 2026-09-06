@@ -37,7 +37,7 @@
   display: block;
   text-decoration: none;
   color: inherit;
-  background: #d9d9d9;
+  background: var(--colour-green);
   border-radius: 16px;
   padding: 16px;
   margin-top: 16px;
@@ -54,7 +54,7 @@
 .UpcomingActivitiesDate {
   font-weight: 400;
   font-size: 13px;
-  color: #4a4a4a;
+  color: var(--colour-dark);
   margin-top: 4px;
 }
  
@@ -65,14 +65,14 @@
 }
  
 .UpcomingActivityRow {
-  background: #bfbfbf;
+  background: var(--colour-light);
   border-radius: 10px;
   padding: 10px 14px;
 }
  
 .UpcomingActivityRow--empty {
   text-align: center;
-  color: #4a4a4a;
+  color: var(--colour-light);
 }
  
 .UpcomingActivityTime {
@@ -101,7 +101,7 @@
 
   /* Firefox: thin, muted scrollbar instead of the default chunky one */
   scrollbar-width: thin;
-  scrollbar-color: #b5b0a8 transparent;
+  scrollbar-color: var(--colour-green) transparent;
 }
 
 /* Chrome/Safari/Edge: custom scrollbar track + thumb */
@@ -127,7 +127,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: #d4d1cb; /* slightly warmer than pure gray to match your cream page bg */
+  background: var(--colour-dark); /* slightly warmer than pure gray to match your cream page bg */
   border-radius: 16px;
   padding: 16px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -144,16 +144,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--colour-grey);
   border-radius: 10px;
   font-size: 18px;
-  color: #1f2f4d;
+  color: var(--colour-dark);
 }
 
 .DashboardTaskName {
   font-weight: 700;
   font-size: 15px;
-  color: #1f2f4d;
+  color: var(--colour-light);
   line-height: 1.25;
 }
 
@@ -165,8 +165,8 @@
 /* Distinguish "still to do" from "overdue" at a glance, rather than
    both reading as the same gray text */
 .DashboardTaskCard--overdue .DashboardTaskStatus {
-  color: #b3452c;
+  color: var(--colour-yellow);
 }
 .DashboardTaskCard--ontrack .DashboardTaskStatus {
-  color: #6b6b6b;
+  color: var(--colour-grey);
 }

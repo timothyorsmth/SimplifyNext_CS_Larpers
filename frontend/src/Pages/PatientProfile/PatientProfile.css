@@ -29,7 +29,7 @@
 }
 
 .ExportInfo {
-    color: var(--color--dark);
+    color: var(--colour--dark);
     justify-self: end;
 }
 
@@ -42,7 +42,7 @@
 .attribute {
     font-weight: 700;
     font-size: var(--font-size-label);
-    color: var(--color-green);
+    color: var(--colour-darkgreen);
     text-transform: uppercase;
     letter-spacing: 0.02em;
     margin: 0 0 0.25rem;
@@ -71,7 +71,7 @@
     text-transform: capitalize;
     padding: 0.15rem 0.5rem;
     border-radius: 999px;
-    background: #eee;
+    background: var(--colour-grey);
 }
 
 .InfoBox {
