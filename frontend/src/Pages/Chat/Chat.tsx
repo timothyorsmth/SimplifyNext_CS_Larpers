@@ -20,13 +20,11 @@ interface SuggestedActions {
   label: string;
 }
 
-// TODO: add functionality to handle suggested actions
 const SUGGESTEDACTIONS: SuggestedActions[] = [
   { id: 'generate-report', label: 'Generate Report' },
   { id: 'new-daily-actions', label: 'New Daily Actions' },
 ];
 
-// Matches agents.chatBot.AgentMessage on the backend.
 interface AgentMessage {
   role: "user" | "assistant";
   content: string;
@@ -36,11 +34,6 @@ interface ChatActionResponse {
   id: string;
   label: string;
   type: string;
-  // Present when the action carries structured data the frontend needs to
-  // actually perform on approval (e.g. the appointment fields for
-  // "create_schedule_item", the task fields for "create_task", or the
-  // patient-info fields for "update_patient_info") rather than just
-  // re-deriving it from the label.
   payload?: Record<string, unknown> | null;
 }
 
@@ -50,18 +43,19 @@ interface ChatApiResponse {
 }
 
 
-// Function call to send a message to chat bot :)
-// Sends the WHOLE conversation so far, not just the latest message — the
-// backend agent flattens this into one turn (see _buildChatTranscript in
-// chatBot.py) so it can ask a clarifying question and understand the next
-// reply in context.
-export async function chatResponse(messages: AgentMessage[]) {
+// Now includes patientContext — the caregiver's full care-recipient record
+// (personal info, medical history, medications, appointments) — so the
+// model can actually answer questions about the patient instead of only
+// seeing raw conversation text. See _buildChatTranscript in chatBot.py for
+// how this gets formatted into the prompt.
+export async function chatResponse(messages: AgentMessage[], patientContext: unknown) {
   const response = await fetch(`${API_BASE}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       messages,
       today: new Date().toISOString().split("T")[0],
+      patientContext,
     }),
   });
 
@@ -72,10 +66,8 @@ export async function chatResponse(messages: AgentMessage[]) {
   return response.json();
 }
 
-// wrapper function :|
-// formats the raw backend response into the shape the UI wants
-export async function sendChatMessage(messages: AgentMessage[]): Promise<ChatApiResponse> {
-  const raw = await chatResponse(messages);
+export async function sendChatMessage(messages: AgentMessage[], patientContext: unknown): Promise<ChatApiResponse> {
+  const raw = await chatResponse(messages, patientContext);
 
   return {
     text: raw.text ?? raw.message ?? '',
@@ -84,9 +76,8 @@ export async function sendChatMessage(messages: AgentMessage[]): Promise<ChatApi
 }
 
 function Chat() {
-  // states for chat messages
   const { messages, setMessages, clearMessages } = useChat();
-  const { addAppointment, updateRecipientInfo } = useCareRecipientInfo();
+  const { careRecipient, addAppointment, updateRecipientInfo } = useCareRecipientInfo();
   const { createTask } = useTaskInfo();
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -104,9 +95,6 @@ function Chat() {
     const thinkingId = crypto.randomUUID();
     const thinkingMessage: ChatMessage = { id: thinkingId, role: 'ai', text: '…', isThinking: true };
 
-    // Build the history to send BEFORE adding the thinking placeholder —
-    // that placeholder text ("…") is UI-only and should never be sent to
-    // the backend as if it were a real assistant turn.
     const history: AgentMessage[] = [
       ...messages
         .filter((m) => !m.isThinking)
@@ -122,7 +110,7 @@ function Chat() {
     setIsSending(true);
 
     try {
-      const aiResponse: ChatApiResponse = await sendChatMessage(history);
+      const aiResponse: ChatApiResponse = await sendChatMessage(history, careRecipient);
 
       const actions: ChatAction[] | undefined = aiResponse.actions?.map((action) => ({
         id: action.id,
@@ -138,7 +126,6 @@ function Chat() {
         )
       );
     } catch {
-      // Send error message
       setMessages((prev) =>
         prev.map((m) =>
           m.id === thinkingId
@@ -147,7 +134,6 @@ function Chat() {
         )
       );
     } finally {
-      // Post AI stuff here
       setIsSending(false);
     }
   }
@@ -159,8 +145,6 @@ function Chat() {
     payload?: Record<string, unknown> | null
   ) {
     if (type === 'create_schedule_item' && payload) {
-      // Same shared store Schedule.tsx's "+" popup writes into — the
-      // appointment shows up on the Schedule page without any extra wiring.
       addAppointment(payload as Omit<Appointment, 'id'>);
       setMessages((prev) => [
         ...prev,
@@ -170,9 +154,6 @@ function Chat() {
     }
 
     if (type === 'create_task' && payload) {
-      // Same shared store Tasks.tsx's "Create Task" and "Create with AI"
-      // popups write into — the task shows up on the Tasks page without
-      // any extra wiring.
       createTask(payload as Omit<Task, "id" | "completed">);
       setMessages((prev) => [
         ...prev,
@@ -182,10 +163,6 @@ function Chat() {
     }
 
     if (type === 'update_patient_info' && payload) {
-      // Patches whichever fields the model included — see
-      // RecipientInfoUpdate in CareRecipientContext.tsx for the allowed
-      // keys. The Patient Profile page reflects this immediately since it
-      // reads from the same shared context.
       updateRecipientInfo(payload as RecipientInfoUpdate);
       setMessages((prev) => [
         ...prev,
@@ -194,8 +171,6 @@ function Chat() {
       return;
     }
 
-    // TODO: wire up generate_report / confirm_generic once those flows exist.
-    // For now they just confirm without doing anything.
     console.log('Approved (not yet wired):', { actionId, type, payload });
     setMessages((prev) => [
       ...prev,

@@ -46,10 +46,15 @@ app.add_middleware(
 
 # For chat bot :) -- now takes the full conversation (not just the latest
 # message) so the agent can hold a real back-and-forth, e.g. asking "what
-# time?" and understanding the caregiver's next reply in context.
+# time?" and understanding the caregiver's next reply in context. Also
+# takes patientContext — the caregiver's full care-recipient record — so
+# the agent can actually answer questions about the patient instead of
+# only seeing raw conversation text. See _formatPatientContext in
+# chatBot.py for how this gets used.
 class ChatRequest(BaseModel):
     messages: list[AgentMessage]
     today: str
+    patientContext: dict | None = None
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(payload: ChatRequest):
@@ -57,6 +62,7 @@ def chat(payload: ChatRequest):
         return runChatAgent(
             [m.model_dump() for m in payload.messages],
             payload.today,
+            payload.patientContext,
         )
     except Exception as e:
         print(f"ERROR: {e}")

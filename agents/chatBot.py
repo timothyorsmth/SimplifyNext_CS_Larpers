@@ -4,8 +4,9 @@ Chat bot backend for the care-coordination app.
 This module wraps a Claude model (via AWS Bedrock) so the frontend can turn
 plain-English messages from a caregiver into either:
   - a conversational reply that can optionally propose a structured action
-    button (e.g. scheduling an appointment) — the general chat widget, via
-    `runChatAgent` + `getChatBotSystemPrompt`, or
+    button (e.g. scheduling an appointment, creating a task, or updating
+    patient info) — the general chat widget, via `runChatAgent` +
+    `getChatBotSystemPrompt`, or
   - a structured task (the "Create with AI" flow on the Tasks page, via
     `runTaskAgent` + `getTaskAgentSystemPrompt`).
 
@@ -15,8 +16,15 @@ whole conversation-so-far into one big user turn (see the comment above
 `_buildTaskAgentTranscript` for why). The task-agent path asks for strict
 JSON the whole way through; the general chat path asks for plain text, plus
 an optional trailing `ACTION_JSON:` line when — and only when — the
-caregiver is asking to schedule something, which `_extractChatAction` peels
-off before the text reaches the frontend.
+caregiver is asking to schedule something, create a task, or update the
+patient's personal info, which `_extractChatAction` peels off before the
+text reaches the frontend.
+
+The general chat path also receives the caregiver's full patient record
+(personal info, medical history, medications, appointments) as part of the
+prompt on every turn — see `_formatPatientContext` — so the model can
+actually answer questions about the patient instead of only ever seeing
+raw conversation text.
 
 `main()` is a quick manual smoke test — type a question in the terminal and
 see what Claude says, without going through the frontend or a server.
@@ -39,7 +47,13 @@ class AgentMessage(BaseModel):
 class ChatAction(BaseModel):
     id: str
     label: str
-    type: Literal["create_task", "create_schedule_item", "generate_report", "confirm_generic", "update_patient_info"]
+    type: Literal[
+        "create_task",
+        "create_schedule_item",
+        "generate_report",
+        "confirm_generic",
+        "update_patient_info",
+    ]
     # optional payload the frontend echoes back on approval, so you don't
     # have to re-derive "what was this button for" from the label text
     payload: Optional[dict] = None
@@ -98,13 +112,14 @@ def chatPrompt(userPrompt: str, systemPrompt: str = "", debug: bool = False):
         #    Also prevents prompt injection!!
         "system": systemPrompt,
 
-        # 4. idk what this does im so fr.
+        # 5. idk what this does im so fr.
         "temperature": 0,
-         # Stops generation the moment the model tries to hallucinate a new
-        # turn in the transcript format used by _buildChatTranscript /
-        # _buildTaskAgentTranscript. Without this, the model can keep
-        # inventing "Caregiver: ..." messages and replying to itself
-        # instead of stopping after its real answer.
+
+        # 6. Stops generation the moment the model tries to hallucinate a
+        #    new turn in the transcript format used by _buildChatTranscript /
+        #    _buildTaskAgentTranscript. Without this, the model can keep
+        #    inventing "Caregiver: ..." messages and replying to itself
+        #    instead of stopping after its real answer.
         "stop_sequences": ["\nCaregiver:", "\nAssistant:", "\nHuman:"],
     }
 
@@ -193,7 +208,7 @@ def runTaskAgent(
         return TaskAgentDone(**data).model_dump()
     raise ValueError(f"Task agent returned unknown status: {data!r}")
 
-# --- General chat agent (conversation + optional scheduling action) ---
+# --- General chat agent (conversation + optional scheduling/task/update actions) ---
 #
 # chatAgent.txt defines the assistant's normal persona/behaviour. We don't
 # touch that file here -- instead we layer on a second, separate set of
@@ -203,6 +218,11 @@ def runTaskAgent(
 # owns "how the assistant hands data back to the UI".
 
 CHAT_ACTION_INSTRUCTIONS = (
+    "\nYou have access to the caregiver's actual PATIENT RECORD above this "
+    "conversation. Always answer questions about the patient (medications, "
+    "conditions, appointments, allergies, etc.) using that record. If "
+    "something the caregiver asks about is not present in the record, say "
+    "so plainly rather than guessing or inventing details.\n"
     "\nAdditionally, if -- and only if -- the caregiver is asking you to "
     "schedule, book, or add a medical appointment (not a daily task like a "
     "medication reminder; that's a separate feature), do both of the "
@@ -256,7 +276,9 @@ CHAT_ACTION_INSTRUCTIONS = (
     'being changed, using these exact keys: "first_name", "last_name", '
     '"dateOfBirth" (YYYY-MM-DD), "sex", "bloodType", "allergies" (a list of '
     'strings), "primaryPhysician". Do NOT include any key the caregiver did '
-    'not explicitly ask to change.>}}\n\n'
+    'not explicitly ask to change. When updating allergies, always include '
+    'the COMPLETE desired list (existing allergies plus any being added or '
+    'removed), never just the newly mentioned item on its own.>}}\n\n'
     "Be conservative here: only take this action when the caregiver is "
     "unambiguously stating a correction or update to one of these exact "
     "fields, never when they are just mentioning these details in passing "
@@ -267,11 +289,86 @@ CHAT_ACTION_INSTRUCTIONS = (
     "For anything that isn't an appointment, task, or personal-info update "
     "request, just reply normally and never output an ACTION_JSON line.\n"
 )
+
 def getChatSystemPromptWithActions() -> str:
     return getChatBotSystemPrompt() + "\n\n" + CHAT_ACTION_INSTRUCTIONS
 
-def _buildChatTranscript(messages: list[dict], today: str) -> str:
-    lines = [f"TODAY'S DATE: {today}", "", "CONVERSATION SO FAR:"]
+def _formatPatientContext(patientContext: dict | None) -> str:
+    """
+    Turns the raw CareRecipientData shape (sent from the frontend's
+    CareRecipientContext) into a readable block the model can actually use
+    to answer questions. Returns a placeholder if no data is available yet
+    (e.g. the frontend is still loading when a message is sent).
+    """
+    if not patientContext:
+        return "PATIENT RECORD: (not available)"
+
+    recipient_info = patientContext.get("recipientInfo", {})
+    profile = recipient_info.get("profile", {})
+    medical_history = patientContext.get("medicalHistory", [])
+    medications = patientContext.get("medications", [])
+    appointments = patientContext.get("appointments", [])
+
+    lines = ["PATIENT RECORD:"]
+
+    lines.append(
+        f"Name: {profile.get('first_name', '')} {profile.get('last_name', '')}".strip()
+    )
+    lines.append(f"Date of birth: {recipient_info.get('dateOfBirth', 'unknown')}")
+    lines.append(f"Sex: {recipient_info.get('sex', 'unknown')}")
+    lines.append(f"Blood type: {recipient_info.get('bloodType', 'unknown')}")
+    allergies = recipient_info.get("allergies", [])
+    lines.append(f"Allergies: {', '.join(allergies) if allergies else 'None known'}")
+    lines.append(f"Primary physician: {recipient_info.get('primaryPhysician', 'unknown')}")
+
+    lines.append("\nMedical history:")
+    if medical_history:
+        for entry in medical_history:
+            lines.append(
+                f"- {entry.get('condition', 'Unknown condition')} "
+                f"(diagnosed {entry.get('diagnosedDate', 'unknown')}, "
+                f"status: {entry.get('status', 'unknown')})"
+                + (f" — {entry.get('notes')}" if entry.get("notes") else "")
+            )
+    else:
+        lines.append("- None on record")
+
+    lines.append("\nCurrent medications:")
+    if medications:
+        for med in medications:
+            status_note = f" [{med.get('status')}]" if med.get("status") else ""
+            lines.append(
+                f"- {med.get('name', 'Unknown')} {med.get('dosage', '')} "
+                f"{med.get('frequency', '')}{status_note}"
+            )
+    else:
+        lines.append("- None on record")
+
+    lines.append("\nAppointments:")
+    if appointments:
+        for appt in appointments:
+            lines.append(
+                f"- {appt.get('type', 'Appointment')} on {appt.get('date', 'unknown date')} "
+                f"with {appt.get('provider', 'unknown provider')} "
+                f"({appt.get('status', 'unknown status')})"
+            )
+    else:
+        lines.append("- None on record")
+
+    return "\n".join(lines)
+
+def _buildChatTranscript(
+    messages: list[dict],
+    today: str,
+    patientContext: dict | None = None,
+) -> str:
+    lines = [
+        f"TODAY'S DATE: {today}",
+        "",
+        _formatPatientContext(patientContext),
+        "",
+        "CONVERSATION SO FAR:",
+    ]
     for m in messages:
         speaker = "Caregiver" if m["role"] == "user" else "Assistant"
         lines.append(f"{speaker}: {m['content']}")
@@ -307,13 +404,17 @@ def _extractChatAction(raw: str):
 
     return "\n".join(kept_lines).strip(), action
 
-def runChatAgent(messages: list[dict], today: str) -> dict:
+def runChatAgent(
+    messages: list[dict],
+    today: str,
+    patientContext: dict | None = None,
+) -> dict:
     """
     Runs one turn of the general chat agent and returns a plain dict
     shaped like ChatResponse (text + optional single-item actions list).
     """
-    transcript = _buildChatTranscript(messages, today)
-    raw = chatPrompt(transcript, getChatSystemPromptWithActions(), debug= True)
+    transcript = _buildChatTranscript(messages, today, patientContext)
+    raw = chatPrompt(transcript, getChatSystemPromptWithActions())
     text, action_data = _extractChatAction(raw)
 
     actions = None
@@ -329,7 +430,8 @@ def runChatAgent(messages: list[dict], today: str) -> dict:
 
 def main() -> None:
     userInput = input("Please ask a question: ")
-    chatPrompt(userInput)
+    reply = chatPrompt(userInput, debug=True)
+    print(reply)
 
 if __name__ == "__main__":
     main()
